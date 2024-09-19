@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:turquesa_app/offers_screen.dart';
 import 'franquias_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'booking_screen.dart';
 import 'register_screen.dart';
 import 'team_screen.dart';
-import 'info_screen.dart';
 import 'profile_screen.dart';
+import 'services_screen.dart';
+import 'notifications_screen.dart';
 
 void main() {
   runApp(TurquesaApp());
@@ -26,9 +29,12 @@ class TurquesaApp extends StatelessWidget {
         '/login':(context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
-        '/team': (context) => TeamPage(),
-        '/info': (context) => InfoPage(),
-        '/profile': (context) => ProfilePage(),
+        '/specialists': (context) => TeamPage(),
+        '/services': (context) => ServicesPage(),
+        '/booking': (context) => BookingScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/notifications': (context) => NotificationsPage(),
+        '/offers':(context) => OffersPage(),
       },
     );
   }
