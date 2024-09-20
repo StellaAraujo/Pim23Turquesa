@@ -6,10 +6,10 @@ class NotificationsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
-        title: Text("Notifications"),
+        title: const Text("Notifications"),
       ),
       body: ListView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         children: [
           _buildNotificationCard(
               "Reminder", "Your appointment is tomorrow at 10:00 AM", Icons.calendar_today),
@@ -24,15 +24,15 @@ class NotificationsPage extends StatelessWidget {
 
   Widget _buildNotificationCard(String title, String description, IconData icon) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: Icon(icon, color: Colors.teal, size: 40),
         title: Text(
           title,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(description),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: () {
           // Adicionar funcionalidade de navegação ou ação
         },

@@ -4,19 +4,19 @@ import 'login_screen.dart'; // Importa a tela de Login
 class FranquiasScreen extends StatelessWidget {
   final List<Franquia> franquias = [
     Franquia(
-      imageUrl: 'https://via.placeholder.com/150', // Coloque a URL da imagem da unidade
-      address: 'Rua das Flores, 123 - Centro',
-      hours: 'Seg - Sex: 9h às 18h',
+      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/camarim.png', // Coloque a URL da imagem da unidade
+      address: 'Shopping ABC - Av Pereira Barreto, 42 (Loja 203A)',
+      hours: 'Seg - Sab: 10h às 22h',
     ),
     Franquia(
-      imageUrl: 'https://via.placeholder.com/150', // Coloque a URL da imagem da unidade
-      address: 'Av. Brasil, 456 - Zona Sul',
-      hours: 'Seg - Sex: 10h às 19h',
+      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/esmalteria-beleza.png', // Coloque a URL da imagem da unidade
+      address: 'Rua Continental, 390 - Jardim do Mar, SBC',
+      hours: 'Ter - Sab: 9h às 19h',
     ),
     Franquia(
-      imageUrl: 'https://via.placeholder.com/150', // Coloque a URL da imagem da unidade
-      address: 'Rua Azul, 789 - Jardim América',
-      hours: 'Seg - Sab: 9h às 18h',
+      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/esmalteria-beleza.png', // Coloque a URL da imagem da unidade
+      address: 'Rua das Palmeiras, 29 - Jardim, Santo André',
+      hours: 'Ter - Sab: 9h às 19h',
     ),
   ];
 
@@ -25,7 +25,7 @@ class FranquiasScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Escolha a Unidade'),
-        backgroundColor: Colors.teal[600],
+        backgroundColor: const Color.fromARGB(255, 114, 178, 171),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

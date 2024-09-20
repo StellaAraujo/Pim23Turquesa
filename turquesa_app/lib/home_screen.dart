@@ -6,6 +6,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.teal,
         elevation: 0,
         title: Text(
@@ -91,13 +92,21 @@ class HomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildCategoryCard(
-                          "https://via.placeholder.com/100", "Hair", context),
-                      _buildCategoryCard("https://via.placeholder.com/100",
-                          "Body Spa", context),
-                      _buildCategoryCard("https://via.placeholder.com/100",
-                          "Make Up", context),
+                          "https://i.pinimg.com/236x/f3/5b/27/f35b274af562551fb129e2d033aa536d.jpg",
+                          "Hair",
+                          context),
                       _buildCategoryCard(
-                          "https://via.placeholder.com/100", "Cílios", context),
+                          "https://img.freepik.com/free-photo/beauty-spa_144627-46202.jpg",
+                          "Body Spa",
+                          context),
+                      _buildCategoryCard(
+                          "https://media.istockphoto.com/id/1389918141/photo/studio-shot-of-an-attractive-young-woman-applying-makeup-against-a-brown-background.jpg?s=612x612&w=0&k=20&c=Y9G_TTMSfXbJMGYNDd0dycryGWVUXlWDe4LHO_9w85I=",
+                          "Make Up",
+                          context),
+                      _buildCategoryCard(
+                          "https://media.istockphoto.com/id/1249362060/pt/foto/close-up-portrait-of-young-woman-standing-with-naked-shoulders-and-neck-face-is-touched-by.jpg?s=612x612&w=0&k=20&c=BbNGBWQfIKmj7guuXHdBFa6KjFvOmbHG3xM35Pat8BY=",
+                          "Estetica",
+                          context),
                     ],
                   ),
                 ],
@@ -132,13 +141,13 @@ class HomePage extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildSpecialistCard("https://via.placeholder.com/150",
-                      "Alicia", "4.0", context),
-                  _buildSpecialistCard("https://via.placeholder.com/150",
+                  _buildSpecialistCard("https://img.bebeautiful.in/www-bebeautiful-in/69f66d07ad95469820313b081edaefe1.jpeg?w=300",
+                      "Alicia Silva", "4.0", context),
+                  _buildSpecialistCard("https://static.wixstatic.com/media/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg/v1/fill/w_469,h_505,al_c,q_80,enc_auto/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg",
                       "Cara Sweet", "5.0", context),
-                  _buildSpecialistCard("https://via.placeholder.com/150",
+                  _buildSpecialistCard("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTAukAh40bF3kRrYfug8HzH7MtOw5KB8nHe4oPeXX8F4EvwMYgRqFGY8iOcZlu4h9lMCs&usqp=CAU",
                       "Tonya Jey", "4.5", context),
-                  _buildSpecialistCard("https://via.placeholder.com/150",
+                  _buildSpecialistCard("https://images.ctfassets.net/wlke2cbybljx/2HgQtNM4ViNmRVW6owS0ZU/1b25349ae9c87afc6a6aff0a65bff1e0/037_220024_HOLLYWOOD-PINK-REDS_HM_SOLO-JORDAN-CANDY-CHIC_RM_2308.jpg?fm=jpg",
                       "Tonya Jey", "4.5", context),
                 ],
               ),
@@ -160,6 +169,7 @@ class HomePage extends StatelessWidget {
                         Navigator.pushNamed(context, '/offers');
                       },
                       child: Text("See All")),
+                      
                 ],
               ),
             ),
