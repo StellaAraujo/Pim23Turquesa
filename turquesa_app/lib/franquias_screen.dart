@@ -1,24 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // Para converter a resposta JSON
 import 'login_screen.dart'; // Importa a tela de Login
 
-class FranquiasScreen extends StatelessWidget {
-  final List<Franquia> franquias = [
-    Franquia(
-      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/camarim.png', // Coloque a URL da imagem da unidade
-      address: 'Shopping ABC - Av Pereira Barreto, 42 (Loja 203A)',
-      hours: 'Seg - Sab: 10h às 22h',
-    ),
-    Franquia(
-      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/esmalteria-beleza.png', // Coloque a URL da imagem da unidade
-      address: 'Rua Continental, 390 - Jardim do Mar, SBC',
-      hours: 'Ter - Sab: 9h às 19h',
-    ),
-    Franquia(
-      imageUrl: 'https://franquiaturquesa.com.br/wp-content/uploads/2024/06/esmalteria-beleza.png', // Coloque a URL da imagem da unidade
-      address: 'Rua das Palmeiras, 29 - Jardim, Santo André',
-      hours: 'Ter - Sab: 9h às 19h',
-    ),
-  ];
+class FranquiasScreen extends StatefulWidget {
+  @override
+  _FranquiasScreenState createState() => _FranquiasScreenState();
+}
+
+class _FranquiasScreenState extends State<FranquiasScreen> {
+  List<Franquia> franquias = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFranquias();
+  }
+
+  Future<void> fetchFranquias() async {
+    final response = await http.get(Uri.parse('http://192.168.15.14:3000/franquias'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        franquias = data.map((franquia) => Franquia(
+          imageUrl: franquia['imagemUrl'],  // Verifique se este nome está correto
+          address: franquia['endereco'],      // Verifique se este nome está correto
+          hours: franquia['horario'],         // Verifique se este nome está correto
+        )).toList();
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load franquias');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +43,25 @@ class FranquiasScreen extends StatelessWidget {
         title: Text('Escolha a Unidade'),
         backgroundColor: const Color.fromARGB(255, 114, 178, 171),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: franquias.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-              child: FranquiaCard(franquia: franquias[index]),
-            );
-          },
-        ),
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView.builder(
+                itemCount: franquias.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                    child: FranquiaCard(franquia: franquias[index]),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

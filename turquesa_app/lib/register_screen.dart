@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Necessário para usar input formatters
 import 'package:intl/intl.dart'; // Para formatar a data
+import 'dart:convert'; // Para converter dados para JSON
+import 'login_screen.dart';
+import 'package:http/http.dart' as http; // Para fazer requisições HTTP
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -9,9 +12,26 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   bool _obscureText = true;
+
+  // Controladores para os campos de texto
   final _cpfController = TextEditingController();
   final _dateController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  // Limpeza dos controladores ao finalizar a página
+  @override
+  void dispose() {
+    _cpfController.dispose();
+    _dateController.dispose();
+    _phoneController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   // Formatação de data (dd/MM/yyyy)
   void _selectDate(BuildContext context) async {
@@ -25,6 +45,69 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
+    }
+  }
+
+  // Função para registrar o usuário
+  Future<void> _registerUser() async {
+    // Coleta de dados do formulário
+    final String name = _nameController.text;
+    final String cpf = _cpfController.text;
+    final String birthDate = _dateController.text;
+    final String phone = _phoneController.text;
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    // URL da API de registro
+    const String url = 'http://localhost:3000/user/register';
+
+    try {
+      // Criação do corpo da requisição
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'name': name,
+          'cpf': cpf,
+          'birthDate': birthDate,
+          'phone': phone,
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      // Verificação do sucesso do registro
+      if (response.statusCode == 201) {
+        // Se for bem-sucedido
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuário registrado com sucesso!')),
+        );
+
+        // Limpa os campos
+      _nameController.clear();
+      _cpfController.clear();
+      _dateController.clear();
+      _phoneController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+
+      // Navega para a tela de login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()), // Altere LoginPage() para a sua tela de login
+      );
+
+      } else {
+        // Caso dê erro no servidor
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao registrar o usuário: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      // Tratamento de erros
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
     }
   }
 
@@ -50,6 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             // Campo de Nome
             TextField(
+              controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nome',
                 labelStyle: TextStyle(color: Colors.teal[700]),
@@ -133,6 +217,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             // Campo de Email
             TextField(
+              controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 labelText: 'Email',
@@ -149,6 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             // Campo de Senha com ícone de "olhinho"
             TextField(
+              controller: _passwordController,
               obscureText: _obscureText,
               decoration: InputDecoration(
                 labelText: 'Senha',
@@ -184,7 +270,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 16),
               ),
               onPressed: () {
-                // Ação de registro
+                _registerUser(); // Chama a função ao pressionar o botão
               },
               child: const Text('Registrar', style: TextStyle(fontSize: 16)),
             ),
@@ -198,7 +284,8 @@ class _RegisterPageState extends State<RegisterPage> {
 // Máscara para CPF
 class _CpfInputFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     final text = newValue.text;
     if (text.length <= 11) {
       final newText = StringBuffer();
@@ -228,10 +315,12 @@ class _CpfInputFormatter extends TextInputFormatter {
   }
 }
 
+
 // Máscara para Telefone
 class _PhoneInputFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     final text = newValue.text;
     if (text.length <= 11) {
       final newText = StringBuffer();

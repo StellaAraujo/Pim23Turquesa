@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart'; // Importa a tela de Registro
 import 'home_screen.dart'; // Importa a tela de Home
+import 'dart:convert'; // Para converter dados para JSON
+import 'package:http/http.dart' as http; // Para fazer requisições HTTP
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,6 +11,52 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
+
+  // Controladores para os campos de texto
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  // Função para autenticar o usuário
+  Future<void> _authenticateUser() async {
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    const String url = 'http://localhost:3000/user/login'; // URL da sua API de login
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Se a autenticação for bem-sucedida
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login realizado com sucesso!')),
+        );
+
+        // Navega para a tela de Home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Se as credenciais estiverem erradas
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email ou senha inválidos')),
+        );
+      }
+    } catch (e) {
+      // Tratamento de erros
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +88,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Campo de e-mail
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.teal[700]),
@@ -55,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // Campo de senha com ícone de "olhinho"
               TextField(
+                controller: _passwordController,
                 obscureText: _obscureText,
                 decoration: InputDecoration(
                   labelText: 'Senha',
@@ -90,10 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 16),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                  _authenticateUser(); // Chama a função de autenticação
                 },
                 child: Text('Entrar', style: TextStyle(fontSize: 16)),
               ),
