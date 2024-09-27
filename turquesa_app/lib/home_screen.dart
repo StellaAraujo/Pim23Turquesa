@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'service_details_page.dart';
+import 'package:turquesa_app/services_api.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -35,93 +37,84 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Barra de pesquisa
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search for services",
-                  prefixIcon: Icon(Icons.search, color: Colors.teal),
-                  filled: true,
-                  fillColor: Colors.teal[50],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+            // Espaço para logo
+            SizedBox(height: 20),
+            Center(
+              child: Image.network(
+                "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png", // Substitua pela URL da logo
+                height: 100,
               ),
             ),
-            // Cards de categorias (Services)
+            SizedBox(height: 16), // Espaçamento após a logo
+
+            // Cards de serviços (grid)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Cabeçalho da seção com o botão See All
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Services',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          // Navega para a tela de serviços detalhados
-                          Navigator.pushNamed(context, '/services');
-                        },
-                        child: Text(
-                          'See All',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Cabeçalho da seção
+                  Text(
+                    'Services',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  SizedBox(height: 16.0), // Espaçamento entre o título e os cards
 
-                  SizedBox(
-                      height: 16.0), // Espaçamento entre o título e os cards
-
-                  // Linha de cards de categorias
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  // Grid de cards de serviços
+                  GridView.count(
+                    crossAxisCount: 3, // 3 cards por linha
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(), // Impede rolagem
+                    childAspectRatio: 0.85, // Proporção da altura para a largura
                     children: [
                       _buildCategoryCard(
-                          "https://i.pinimg.com/236x/f3/5b/27/f35b274af562551fb129e2d033aa536d.jpg",
-                          "Hair",
-                          context),
+                        "https://kproserragaucha.com.br/wp-content/uploads/2022/10/Untitled-1-1.jpg",
+                        "Cabelo",
+                        context,
+                      ),
                       _buildCategoryCard(
-                          "https://img.freepik.com/free-photo/beauty-spa_144627-46202.jpg",
-                          "Body Spa",
-                          context),
+                        "https://img.freepik.com/free-photo/beauty-spa_144627-46202.jpg",
+                        "Body Spa",
+                        context,
+                      ),
                       _buildCategoryCard(
-                          "https://media.istockphoto.com/id/1389918141/photo/studio-shot-of-an-attractive-young-woman-applying-makeup-against-a-brown-background.jpg?s=612x612&w=0&k=20&c=Y9G_TTMSfXbJMGYNDd0dycryGWVUXlWDe4LHO_9w85I=",
-                          "Make Up",
-                          context),
+                        "https://i0.wp.com/priflor.com/wp-content/uploads/2023/12/maquiagem_pele_negra_02.webp?fit=828%2C828&ssl=1",
+                        "Maquiagem",
+                        context,
+                      ),
                       _buildCategoryCard(
-                          "https://media.istockphoto.com/id/1249362060/pt/foto/close-up-portrait-of-young-woman-standing-with-naked-shoulders-and-neck-face-is-touched-by.jpg?s=612x612&w=0&k=20&c=BbNGBWQfIKmj7guuXHdBFa6KjFvOmbHG3xM35Pat8BY=",
-                          "Estetica",
-                          context),
+                        "https://media.istockphoto.com/id/1389918141/photo/studio-shot-of-an-attractive-young-woman-applying-makeup-against-a-brown-background.jpg?s=612x612&w=0&k=20&c=Y9G_TTMSfXbJMGYNDd0dycryGWVUXlWDe4LHO_9w85I=",
+                        "Estética",
+                        context,
+                      ),
+                      _buildCategoryCard(
+                        "https://boaforma.abril.com.br/wp-content/uploads/sites/2/2023/12/cuidados-na-hora-de-fazer-as-unhas.jpg?crop=1&resize=1212,909",
+                        "Unhas",
+                        context,
+                      ),
+                      _buildCategoryCard(
+                        "https://media.istockphoto.com/id/845708412/pt/foto/eyelash-extension-procedure-woman-eye-with-long-eyelashes-lashes-close-up-macro-selective-focus.jpg?s=612x612&w=0&k=20&c=AtbS1bVvcfgKooF-Dd0wkDSpAc5zPzvgiHUHc94gwWU=",
+                        "Cílios",
+                        context,
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
 
-            // Beauty Specialists
-            SizedBox(height: 10),
+            /* Beauty Specialists
+            SizedBox(height: 20), // Espaço entre ofertas e especialistas
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Beauty Specialist",
+                    "Beauty Specialists",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
@@ -129,8 +122,7 @@ class HomePage extends StatelessWidget {
                       // Navega para a tela de especialistas detalhados
                       Navigator.pushNamed(context, '/specialists');
                     },
-                    child:
-                        Text("See All", style: TextStyle(color: Colors.teal)),
+                    child: Text("See All", style: TextStyle(color: Colors.teal)),
                   ),
                 ],
               ),
@@ -141,58 +133,49 @@ class HomePage extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildSpecialistCard("https://img.bebeautiful.in/www-bebeautiful-in/69f66d07ad95469820313b081edaefe1.jpeg?w=300",
-                      "Alicia Silva", "4.0", context),
-                  _buildSpecialistCard("https://static.wixstatic.com/media/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg/v1/fill/w_469,h_505,al_c,q_80,enc_auto/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg",
-                      "Cara Sweet", "5.0", context),
-                  _buildSpecialistCard("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTAukAh40bF3kRrYfug8HzH7MtOw5KB8nHe4oPeXX8F4EvwMYgRqFGY8iOcZlu4h9lMCs&usqp=CAU",
-                      "Tonya Jey", "4.5", context),
-                  _buildSpecialistCard("https://images.ctfassets.net/wlke2cbybljx/2HgQtNM4ViNmRVW6owS0ZU/1b25349ae9c87afc6a6aff0a65bff1e0/037_220024_HOLLYWOOD-PINK-REDS_HM_SOLO-JORDAN-CANDY-CHIC_RM_2308.jpg?fm=jpg",
-                      "Tonya Jey", "4.5", context),
+                  _buildSpecialistCard(
+                      "https://img.bebeautiful.in/www-bebeautiful-in/69f66d07ad95469820313b081edaefe1.jpeg?w=300",
+                      "Alicia Silva",
+                      "4.0",
+                      context),
+                  _buildSpecialistCard(
+                      "https://static.wixstatic.com/media/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg/v1/fill/w_469,h_505,al_c,q_80,enc_auto/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg",
+                      "Cara Sweet",
+                      "5.0",
+                      context),
+                  _buildSpecialistCard(
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTAukAh40bF3kRrYfug8HzH7MtOw5KB8nHe4oPeXX8F4EvwMYgRqFGY8iOcZlu4h9lMCs&usqp=CAU",
+                      "Tonya Jey",
+                      "4.5",
+                      context),
+                  _buildSpecialistCard(
+                      "https://images.ctfassets.net/wlke2cbybljx/2HgQtNM4ViNmRVW6owS0ZU/1b25349ae9c87afc6a6aff0a65bff1e0/037_220024_HOLLYWOOD-PINK-REDS_HM_SOLO-JORDAN-CANDY-CHIC_RM_2308.jpg?fm=jpg",
+                      "Tonya Jey",
+                      "4.5",
+                      context),
                 ],
               ),
-            ),
+            ),*/
 
-            // Ofertas
+            // Dicas de Beleza
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Best Offers",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/offers');
-                      },
-                      child: Text("See All")),
-                      
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0), // Aumentar espaço acima
+              child: Text(
+                "Dicas de Beleza",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/offers');
-                },
-                child: Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.teal[100],
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "50% OFF on all makeup services!",
-                      style: TextStyle(color: Colors.teal[900], fontSize: 18),
-                    ),
-                  ),
-                ),
-              ),
+            Column(
+              children: [
+                _buildTipCard(
+                    "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png",
+                    "Hidratação é Fundamental",
+                    "Beba bastante água todos os dias."),
+                _buildTipCard(
+                    "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png",
+                    "Cuide da Sua Pele",
+                    "Use protetor solar diariamente."),
+              ],
             ),
           ],
         ),
@@ -210,8 +193,8 @@ class HomePage extends StatelessWidget {
               Navigator.pushNamed(context, '/');
               break;
             case 1:
-              // Navegar para a tela Offers
-              Navigator.pushNamed(context, '/offers');
+              // Navegar para a tela Specialists
+              Navigator.pushNamed(context, '/specialists');
               break;
             case 2:
               // Navegar para a tela Booking
@@ -225,72 +208,101 @@ class HomePage extends StatelessWidget {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer), label: "Offers"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: "Booking"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Specialists"),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: "Booking"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
     );
   }
 
-  // Função para construir os cards de categorias
-  Widget _buildCategoryCard(
-      String imageUrl, String label, BuildContext context) {
+  // Método para construir o card de categoria
+  Widget _buildCategoryCard(String imageUrl, String categoryName, BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Navega para a tela de serviços detalhados
-        Navigator.pushNamed(context, '/services');
-      },
-      child: Container(
-        width: 80,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          elevation: 4,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.network(
-                imageUrl,
-                width: 50,
-                height: 50,
+      onTap: () async {
+  try {
+    // Chama a função de requisição para buscar subcategorias da categoria selecionada
+    var subcategories = await ServicesAPI.getSubcategories(categoryName);
+
+    // Navega para a tela de detalhes com as subcategorias recebidas
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ServiceDetailsPage(
+          categoryName: categoryName,
+          subcategories: subcategories,
+        ),
+      ),
+    );
+  } catch (e) {
+    // Se ocorrer algum erro, mostra uma mensagem no console
+    print('Erro ao carregar subcategorias: $e');
+  }
+},
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: Image.network(imageUrl, fit: BoxFit.cover),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                categoryName,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
-              Text(label, style: TextStyle(color: Colors.teal)),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // Função para construir os cards de especialistas
-  Widget _buildSpecialistCard(
-      String imageUrl, String name, String rating, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navega para a tela de especialistas detalhados
-        Navigator.pushNamed(context, '/specialists');
-      },
-      child: Container(
-        width: 120,
-        margin: EdgeInsets.only(right: 16),
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: NetworkImage(imageUrl),
+  /* Método para construir o card de especialista
+  Widget _buildSpecialistCard(String imageUrl, String name, String rating, BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: Image.network(imageUrl, fit: BoxFit.cover),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              name,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text(name,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            Text("Rating: $rating", style: TextStyle(color: Colors.teal[700])),
-          ],
-        ),
+          ),
+          Text('Rating: $rating', style: TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }*/
+
+  // Método para construir o card de dica
+  Widget _buildTipCard(String imageUrl, String title, String description) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Image.network(imageUrl, fit: BoxFit.cover),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(description),
+          ),
+        ],
       ),
     );
   }

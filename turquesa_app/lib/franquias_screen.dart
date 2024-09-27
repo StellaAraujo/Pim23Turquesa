@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:turquesa_app/home_screen.dart';
 import 'dart:convert'; // Para converter a resposta JSON
 import 'login_screen.dart'; // Importa a tela de Login
 
@@ -25,9 +26,10 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
       List<dynamic> data = json.decode(response.body);
       setState(() {
         franquias = data.map((franquia) => Franquia(
-          imageUrl: franquia['imagemUrl'],  // Verifique se este nome está correto
-          address: franquia['endereco'],      // Verifique se este nome está correto
-          hours: franquia['horario'],         // Verifique se este nome está correto
+          nome: franquia['nome'],
+          imageUrl: franquia['imagemUrl'],  
+          address: franquia['endereco'],      
+          hours: franquia['horario'],         
         )).toList();
         isLoading = false;
       });
@@ -40,38 +42,53 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Escolha a Unidade'),
-        backgroundColor: const Color.fromARGB(255, 114, 178, 171),
+        title: Text('Escolha a Unidade: ', style: TextStyle(fontSize: 18),),
+        backgroundColor: const Color.fromARGB(255, 125, 177, 171),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView.builder(
-                itemCount: franquias.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
-                    child: FranquiaCard(franquia: franquias[index]),
-                  );
-                },
-              ),
+          : Column(
+              children: [
+                // Container para a logo
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Image.network(
+                    'https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png', // Substitua pelo URL da sua logo ou use Image.asset
+                    height: 100,
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListView.builder(
+                      itemCount: franquias.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => HomePage()),
+                            );
+                          },
+                          child: FranquiaCard(franquia: franquias[index]),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }
 }
 
 class Franquia {
+  final String nome;
   final String imageUrl;
   final String address;
   final String hours;
 
-  Franquia({required this.imageUrl, required this.address, required this.hours});
+  Franquia({required this.nome, required this.imageUrl, required this.address, required this.hours});
 }
 
 class FranquiaCard extends StatelessWidget {
@@ -106,9 +123,17 @@ class FranquiaCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
+                    franquia.nome,  // Exibe o nome da franquia
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
                     franquia.address,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -116,7 +141,7 @@ class FranquiaCard extends StatelessWidget {
                   Text(
                     franquia.hours,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey[600],
                     ),
                   ),

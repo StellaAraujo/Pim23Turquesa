@@ -1,3 +1,5 @@
+//server.js
+
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -5,7 +7,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const franquiasRoute = require('./routes/franquias_route');
 const userRoutes = require('./routes/user_route');
+const services_route= require('./routes/services_route');
 const { register } = require('./controllers/userController');
+
 
 dotenv.config();
 
@@ -23,6 +27,7 @@ app.use(express.json());
 // Usa a rota de franquias
 app.use('/franquias', franquiasRoute);
 app.use('/user', userRoutes);
+app.use('/services',services_route);
 
 
 // Servidor escutando na porta 3000

@@ -59,7 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final String password = _passwordController.text;
 
     // URL da API de registro
-    const String url = 'http://localhost:3000/user/register';
+    const String url = 'http://192.168.15.14:3000/user/register';
 
     try {
       // Criação do corpo da requisição
@@ -84,23 +84,25 @@ class _RegisterPageState extends State<RegisterPage> {
         );
 
         // Limpa os campos
-      _nameController.clear();
-      _cpfController.clear();
-      _dateController.clear();
-      _phoneController.clear();
-      _emailController.clear();
-      _passwordController.clear();
+        _nameController.clear();
+        _cpfController.clear();
+        _dateController.clear();
+        _phoneController.clear();
+        _emailController.clear();
+        _passwordController.clear();
 
-      // Navega para a tela de login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()), // Altere LoginPage() para a sua tela de login
-      );
-
+        // Navega para a tela de login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  LoginPage()), // Altere LoginPage() para a sua tela de login
+        );
       } else {
         // Caso dê erro no servidor
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao registrar o usuário: ${response.body}')),
+          SnackBar(
+              content: Text('Erro ao registrar o usuário: ${response.body}')),
         );
       }
     } catch (e) {
@@ -126,7 +128,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: <Widget>[
             // Logo acima do formulário
             Image.network(
-              'https://alugueon.com.br/wp-content/uploads/2023/02/logo-turquesa-esmalteria-franquia-alugueon.png', // Substitua pela URL da logo
+              'https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png', // Substitua pela URL da logo
               height: 120,
             ),
             SizedBox(height: 20),
@@ -136,12 +138,13 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nome',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
               ),
             ),
@@ -158,12 +161,13 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
               decoration: InputDecoration(
                 labelText: 'CPF',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
               ),
             ),
@@ -175,21 +179,24 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.datetime,
               decoration: InputDecoration(
                 labelText: 'Data de Nascimento',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.calendar_today, color: Colors.teal),
+                  icon: Icon(
+                    Icons.calendar_today,
+                    color: Colors.teal[700],
+                  ),
                   onPressed: () {
                     _selectDate(context);
                   },
                 ),
               ),
-              readOnly: true, // Impede a digitação manual
             ),
             SizedBox(height: 20),
 
@@ -204,12 +211,13 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
               decoration: InputDecoration(
                 labelText: 'Telefone',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
               ),
             ),
@@ -221,12 +229,13 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
               ),
             ),
@@ -238,12 +247,13 @@ class _RegisterPageState extends State<RegisterPage> {
               obscureText: _obscureText,
               decoration: InputDecoration(
                 labelText: 'Senha',
-                labelStyle: TextStyle(color: Colors.teal[700]),
+                labelStyle:
+                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.teal),
+                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -263,11 +273,10 @@ class _RegisterPageState extends State<RegisterPage> {
             // Botão de Registro
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal[600],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 16),
+                backgroundColor: const Color.fromARGB(155, 141, 222, 213),
+                foregroundColor:const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
               ),
               onPressed: () {
                 _registerUser(); // Chama a função ao pressionar o botão
@@ -314,7 +323,6 @@ class _CpfInputFormatter extends TextInputFormatter {
     return oldValue;
   }
 }
-
 
 // Máscara para Telefone
 class _PhoneInputFormatter extends TextInputFormatter {
