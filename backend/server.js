@@ -10,7 +10,6 @@ const userRoutes = require('./routes/user_route');
 const services_route= require('./routes/services_route');
 const { register } = require('./controllers/userController');
 
-
 dotenv.config();
 
 // Substitua pela URL de conexão do seu MongoDB Atlas

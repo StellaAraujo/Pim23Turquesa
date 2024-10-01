@@ -6,14 +6,14 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 125, 177, 171),
         elevation: 0,
         title: Text(
-          "Hello, Usuário",
-          style: TextStyle(color: Colors.white),
+          "Hello, Usuário.",
+          style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
         ),
         actions: [
           IconButton(
@@ -23,14 +23,14 @@ class HomePage extends StatelessWidget {
               Navigator.pushNamed(context, '/notifications');
             },
           ),
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundImage: NetworkImage(
                 "https://via.placeholder.com/150", // Substitua pela URL da imagem do usuário
               ),
             ),
-          )
+          )*/
         ],
       ),
       body: SingleChildScrollView(
@@ -55,20 +55,22 @@ class HomePage extends StatelessWidget {
                 children: [
                   // Cabeçalho da seção
                   Text(
-                    'Services',
+                    'Serviços:',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16.0), // Espaçamento entre o título e os cards
+                  SizedBox(
+                      height: 16.0), // Espaçamento entre o título e os cards
 
                   // Grid de cards de serviços
                   GridView.count(
                     crossAxisCount: 3, // 3 cards por linha
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(), // Impede rolagem
-                    childAspectRatio: 0.85, // Proporção da altura para a largura
+                    childAspectRatio:
+                        0.85, // Proporção da altura para a largura
                     children: [
                       _buildCategoryCard(
                         "https://kproserragaucha.com.br/wp-content/uploads/2022/10/Untitled-1-1.jpg",
@@ -159,20 +161,21 @@ class HomePage extends StatelessWidget {
 
             // Dicas de Beleza
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0), // Aumentar espaço acima
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0, vertical: 16.0), // Aumentar espaço acima
               child: Text(
-                "Dicas de Beleza",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                "Dicas de Beleza:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             Column(
               children: [
                 _buildTipCard(
-                    "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png",
+                    Icons.local_drink, // Ícone para a dica
                     "Hidratação é Fundamental",
                     "Beba bastante água todos os dias."),
                 _buildTipCard(
-                    "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png",
+                    Icons.wb_sunny, // Ícone para a dica
                     "Cuide da Sua Pele",
                     "Use protetor solar diariamente."),
               ],
@@ -181,9 +184,6 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
         currentIndex: 0,
         onTap: (int index) {
           // Verifica qual item foi clicado e navega para a respectiva tela
@@ -193,14 +193,6 @@ class HomePage extends StatelessWidget {
               Navigator.pushNamed(context, '/');
               break;
             case 1:
-              // Navegar para a tela Specialists
-              Navigator.pushNamed(context, '/specialists');
-              break;
-            case 2:
-              // Navegar para a tela Booking
-              Navigator.pushNamed(context, '/booking');
-              break;
-            case 3:
               // Navegar para a tela Profile
               Navigator.pushNamed(context, '/profile');
               break;
@@ -208,8 +200,6 @@ class HomePage extends StatelessWidget {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Specialists"),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: "Booking"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
@@ -217,28 +207,29 @@ class HomePage extends StatelessWidget {
   }
 
   // Método para construir o card de categoria
-  Widget _buildCategoryCard(String imageUrl, String categoryName, BuildContext context) {
+  Widget _buildCategoryCard(
+      String imageUrl, String categoryName, BuildContext context) {
     return GestureDetector(
       onTap: () async {
-  try {
-    // Chama a função de requisição para buscar subcategorias da categoria selecionada
-    var subcategories = await ServicesAPI.getSubcategories(categoryName);
+        try {
+          // Chama a função de requisição para buscar subcategorias da categoria selecionada
+          var subcategories = await ServicesAPI.getSubcategories(categoryName);
 
-    // Navega para a tela de detalhes com as subcategorias recebidas
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ServiceDetailsPage(
-          categoryName: categoryName,
-          subcategories: subcategories,
-        ),
-      ),
-    );
-  } catch (e) {
-    // Se ocorrer algum erro, mostra uma mensagem no console
-    print('Erro ao carregar subcategorias: $e');
-  }
-},
+          // Navega para a tela de detalhes com as subcategorias recebidas
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ServiceDetailsPage(
+                categoryName: categoryName,
+                subcategories: subcategories,
+              ),
+            ),
+          );
+        } catch (e) {
+          // Se ocorrer algum erro, mostra uma mensagem no console
+          print('Erro ao carregar subcategorias: $e');
+        }
+      },
       child: Card(
         elevation: 4,
         margin: EdgeInsets.all(8.0),
@@ -251,7 +242,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 categoryName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -284,26 +275,13 @@ class HomePage extends StatelessWidget {
   }*/
 
   // Método para construir o card de dica
-  Widget _buildTipCard(String imageUrl, String title, String description) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Image.network(imageUrl, fit: BoxFit.cover),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(description),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildTipCard(IconData icon, String title, String description) {
+  return Card(
+    child: ListTile(
+      leading: Icon(icon, size: 40, color: Color.fromARGB(255, 125, 177, 171)), // Aqui você coloca o ícone
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      subtitle: Text(description),
+    ),
+  );
+}
 }

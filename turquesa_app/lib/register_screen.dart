@@ -59,7 +59,9 @@ class _RegisterPageState extends State<RegisterPage> {
     final String password = _passwordController.text;
 
     // URL da API de registro
-    const String url = 'http://192.168.15.14:3000/user/register';
+    const String url = 'http://localhost:3000/user/register';
+
+    if (!mounted) return;
 
     try {
       // Criação do corpo da requisição
@@ -118,8 +120,8 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Registro'),
-        backgroundColor: Colors.teal[600],
+        title: const Text('Registrar:',style: TextStyle(fontSize: 18, )),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -274,7 +276,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(155, 141, 222, 213),
-                foregroundColor:const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
+                foregroundColor:
+                    const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
                 padding:
                     const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
               ),

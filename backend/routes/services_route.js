@@ -21,14 +21,16 @@ router.get('/:category', async (req, res) => { // Remover '/services' da rota
 
 // Rota para criar um novo serviço
 router.post('/', async (req, res) => { // Remover '/services' da rota
-  const { name, category, subcategory, price } = req.body;
+  const { name, category, subcategory, price, description, image } = req.body;
 
   // Cria uma nova instância de serviço
   const newService = new Service({
     name,
     category,
     subcategory,
-    price
+    price,
+    description,
+    image,
   });
 
   try {
@@ -38,6 +40,35 @@ router.post('/', async (req, res) => { // Remover '/services' da rota
   } catch (error) {
     // Em caso de erro, responde com status 500
     res.status(500).json({ message: 'Erro ao criar o serviço', error });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, category, subcategory, price, description, image } = req.body;
+
+  try {
+    // Busca e atualiza o serviço pelo ID
+    const updatedService = await Service.findByIdAndUpdate(
+      id,
+      {
+        name,
+        category,
+        subcategory,
+        price,
+        description,
+        image,
+      },
+      { new: true } // Retorna o documento atualizado
+    );
+
+    if (!updatedService) {
+      return res.status(404).json({ message: 'Serviço não encontrado' });
+    }
+
+    res.status(200).json({ message: 'Serviço atualizado com sucesso!', updatedService });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar o serviço', error });
   }
 });
 

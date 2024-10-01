@@ -28,7 +28,6 @@ class TurquesaApp extends StatelessWidget {
       routes: {
         '/': (context) => AboutUsScreen(),           // Tela "Sobre Nós"
         '/login': (context) => LoginPage(),          // Tela de Login
-        '/franquias': (context) => FranquiasScreen(),// Tela de Franquias
         '/home': (context) => HomePage(),            // Tela Home
         '/register': (context) => RegisterPage(),    // Tela de Registro
         '/booking': (context) => BookingScreen(),    // Tela de Agendamento

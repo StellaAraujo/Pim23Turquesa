@@ -16,7 +16,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sobre Nós'),
+        title: Text(''),
       ),
       body: Center(
         child: Column(

@@ -27,7 +27,9 @@ class _LoginPageState extends State<LoginPage> {
     final String password = _passwordController.text;
 
     const String url =
-        'http://192.168.15.14:3000/user/login'; // URL da sua API de login
+        'http://localhost:3000/user/login'; // URL da sua API de login
+
+    if (!mounted) return;
 
     try {
       final response = await http.post(
@@ -145,7 +147,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(155, 141, 222, 213),
-                    foregroundColor: const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
+                    foregroundColor: const Color.fromARGB(
+                        169, 0, 0, 0), // Cor do texto do botão
                     padding: EdgeInsets.symmetric(
                         vertical: screenHeight * 0.02), // Padding responsivo
                   ),
@@ -166,7 +169,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(155, 141, 222, 213),
-                    foregroundColor: const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
+                    foregroundColor: const Color.fromARGB(
+                        169, 0, 0, 0), // Cor do texto do botão
                     padding: EdgeInsets.symmetric(
                         vertical: screenHeight * 0.02), // Padding responsivo
                   ),
