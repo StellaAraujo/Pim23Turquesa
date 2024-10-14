@@ -1,6 +1,10 @@
+//routes/franquias_route.js
+
 const express = require('express');
 const router = express.Router();
 const Franquia = require('../models/franquias');
+const Profissional = require('../models/profissional');
+
 
 // Rota POST para criar uma nova franquia
 router.post('/', async (req, res) => {
@@ -48,6 +52,5 @@ router.put('/:id', async (req, res) => {
     res.status(400).json({ message: 'Erro ao atualizar franquia' });
   }
 });
-
 
 module.exports = router;

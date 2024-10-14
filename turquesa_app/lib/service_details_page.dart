@@ -1,7 +1,7 @@
 //service_details_page.dart
 
 import 'package:flutter/material.dart';
-import 'franquias_screen.dart'; // Importe a tela de Franquias
+import 'franquias_screen.dart';
 
 class ServiceDetailsPage extends StatelessWidget {
   final String categoryName;
@@ -23,15 +23,12 @@ class ServiceDetailsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final service = subcategories[index];
             return GestureDetector(
-              onTap: () {
-                // Navega para a tela de Franquias passando o serviço selecionado
-                Navigator.push(
+              onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => FranquiasScreen(selectedService: service),
                   ),
-                );
-              },
+                ),
               child: Card(
                 margin: EdgeInsets.symmetric(vertical: 10.0),
                 elevation: 5,

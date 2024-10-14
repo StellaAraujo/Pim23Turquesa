@@ -21,6 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>(); // Chave para o formulário
+
   // Limpeza dos controladores ao finalizar a página
   @override
   void dispose() {
@@ -50,69 +52,87 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Função para registrar o usuário
   Future<void> _registerUser() async {
-    // Coleta de dados do formulário
-    final String name = _nameController.text;
-    final String cpf = _cpfController.text;
-    final String birthDate = _dateController.text;
-    final String phone = _phoneController.text;
-    final String email = _emailController.text;
-    final String password = _passwordController.text;
+    if (_formKey.currentState!.validate()) {
+      // Se o formulário for válido, prosseguir com o registro
+      final String name = _nameController.text;
+      final String cpf = _cpfController.text;
+      final String birthDate = _dateController.text;
+      final String phone = _phoneController.text;
+      final String email = _emailController.text;
+      final String password = _passwordController.text;
 
-    // URL da API de registro
-    const String url = 'http://localhost:3000/user/register';
+      // URL da API de registro
+      const String url = 'http://localhost:3000/user/register';
 
-    if (!mounted) return;
-
-    try {
-      // Criação do corpo da requisição
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          'name': name,
-          'cpf': cpf,
-          'birthDate': birthDate,
-          'phone': phone,
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      // Verificação do sucesso do registro
-      if (response.statusCode == 201) {
-        // Se for bem-sucedido
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuário registrado com sucesso!')),
+      try {
+        // Criação do corpo da requisição
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'name': name,
+            'cpf': cpf,
+            'birthDate': birthDate,
+            'phone': phone,
+            'email': email,
+            'password': password,
+          }),
         );
 
-        // Limpa os campos
-        _nameController.clear();
-        _cpfController.clear();
-        _dateController.clear();
-        _phoneController.clear();
-        _emailController.clear();
-        _passwordController.clear();
+        // Verificação do sucesso do registro
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Usuário registrado com sucesso!')),
+          );
 
-        // Navega para a tela de login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  LoginPage()), // Altere LoginPage() para a sua tela de login
-        );
-      } else {
-        // Caso dê erro no servidor
+          // Limpa os campos
+          _nameController.clear();
+          _cpfController.clear();
+          _dateController.clear();
+          _phoneController.clear();
+          _emailController.clear();
+          _passwordController.clear();
+
+          // Navega para a tela de login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao registrar o usuário: ${response.body}')),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Erro ao registrar o usuário: ${response.body}')),
+          SnackBar(content: Text('Erro: $e')),
         );
       }
-    } catch (e) {
-      // Tratamento de erros
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: $e')),
-      );
     }
+  }
+
+  // Função para verificar se a senha é forte
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor, insira uma senha';
+    }
+    // Verificação de critérios de força da senha
+    if (value.length < 8) {
+      return 'A senha deve ter pelo menos 8 caracteres';
+    }
+    if (!RegExp(r'(?=.*?[A-Z])').hasMatch(value)) {
+      return 'A senha deve conter pelo menos uma letra maiúscula';
+    }
+    if (!RegExp(r'(?=.*?[a-z])').hasMatch(value)) {
+      return 'A senha deve conter pelo menos uma letra minúscula';
+    }
+    if (!RegExp(r'(?=.*?[0-9])').hasMatch(value)) {
+      return 'A senha deve conter pelo menos um número';
+    }
+    if (!RegExp(r'(?=.*?[#?!@$%^&*-])').hasMatch(value)) {
+      return 'A senha deve conter pelo menos um caractere especial';
+    }
+    return null; // A senha é forte
   }
 
   @override
@@ -120,239 +140,220 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Registrar:',style: TextStyle(fontSize: 18, )),
+        title: const Text('Registrar:', style: TextStyle(fontSize: 18)),
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            // Logo acima do formulário
-            Image.network(
-              'https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png', // Substitua pela URL da logo
-              height: 120,
-            ),
-            SizedBox(height: 20),
-
-            // Campo de Nome
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nome',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.network(
+                'https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png',
+                height: 120,
               ),
-            ),
-            SizedBox(height: 20),
+              SizedBox(height: 20),
 
-            // Campo de CPF com máscara
-            TextField(
-              controller: _cpfController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(11),
-                _CpfInputFormatter(),
-              ],
-              decoration: InputDecoration(
-                labelText: 'CPF',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-
-            // Campo de Data de Nascimento
-            TextField(
-              controller: _dateController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(
-                labelText: 'Data de Nascimento',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.calendar_today,
-                    color: Colors.teal[700],
+              // Campo de Nome
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Nome',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: () {
-                    _selectDate(context);
-                  },
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira seu nome';
+                  }
+                  return null;
+                },
               ),
-            ),
-            SizedBox(height: 20),
+              SizedBox(height: 20),
 
-            // Campo de Telefone com máscara
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(11),
-                _PhoneInputFormatter(),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Telefone',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-
-            // Campo de Email
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-
-            // Campo de Senha com ícone de "olhinho"
-            TextField(
-              controller: _passwordController,
-              obscureText: _obscureText,
-              decoration: InputDecoration(
-                labelText: 'Senha',
-                labelStyle:
-                    TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.teal[700],
+              // Campo de CPF
+              TextFormField(
+                controller: _cpfController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(14), // CPF formatado: 000.000.000-00
+                  _CpfInputFormatter(),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'CPF',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.length != 14) {
+                    return 'Por favor, insira um CPF válido';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+
+              // Campo de Data de Nascimento
+              TextFormField(
+                controller: _dateController,
+                keyboardType: TextInputType.datetime,
+                decoration: InputDecoration(
+                  labelText: 'Data de Nascimento',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.calendar_today, color: Colors.teal[700]),
+                    onPressed: () {
+                      _selectDate(context);
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira sua data de nascimento';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+
+              // Campo de Telefone
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(15), // Telefone formatado: (00) 00000-0000
+                  _PhoneInputFormatter(),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'Telefone',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.length != 15) {
+                    return 'Por favor, insira um telefone válido';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+
+              // Campo de Email
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty || !value.contains('@')) {
+                    return 'Por favor, insira um e-mail válido';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+
+              // Campo de Senha
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _obscureText,
+                decoration: InputDecoration(
+                  labelText: 'Senha',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.teal[700],
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
+                ),
+                validator: _validatePassword,
+              ),
+              SizedBox(height: 20),
+
+              // Botão de Registro
+              ElevatedButton(
+                onPressed: _registerUser,
+                child: Text('Registrar', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-
-            // Botão de Registro
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(155, 141, 222, 213),
-                foregroundColor:
-                    const Color.fromARGB(169, 0, 0, 0), // Cor do texto do botão
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
-              ),
-              onPressed: () {
-                _registerUser(); // Chama a função ao pressionar o botão
-              },
-              child: const Text('Registrar', style: TextStyle(fontSize: 16)),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Máscara para CPF
+// Formata o CPF (apenas números)
 class _CpfInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    final text = newValue.text;
-    if (text.length <= 11) {
-      final newText = StringBuffer();
-      int selectionIndex = newValue.selection.end;
-
-      if (text.length >= 3) {
-        newText.write(text.substring(0, 3) + '.');
-        if (selectionIndex >= 3) selectionIndex++;
-      }
-      if (text.length >= 6) {
-        newText.write(text.substring(3, 6) + '.');
-        if (selectionIndex >= 6) selectionIndex++;
-      }
-      if (text.length >= 9) {
-        newText.write(text.substring(6, 9) + '-');
-        if (selectionIndex >= 9) selectionIndex++;
-      }
-      if (text.length >= 11) {
-        newText.write(text.substring(9, 11));
-      }
-      return TextEditingValue(
-        text: newText.toString(),
-        selection: TextSelection.collapsed(offset: selectionIndex),
-      );
+    String text = newValue.text.replaceAll(RegExp(r'\D'), ''); // Remove caracteres não numéricos
+    if (text.length > 11) {
+      text = text.substring(0, 11); // Limita a 11 dígitos
     }
-    return oldValue;
+    // Formatação do CPF: 000.000.000-00
+    String formattedText = '';
+    for (int i = 0; i < text.length; i++) {
+      if (i == 3 || i == 6) {
+        formattedText += '.';
+      } else if (i == 9) {
+        formattedText += '-';
+      }
+      formattedText += text[i];
+    }
+    return TextEditingValue(text: formattedText, selection: TextSelection.collapsed(offset: formattedText.length));
   }
 }
 
-// Máscara para Telefone
+// Formata o telefone (apenas números)
 class _PhoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    final text = newValue.text;
-    if (text.length <= 11) {
-      final newText = StringBuffer();
-      int selectionIndex = newValue.selection.end;
-
-      if (text.length >= 2) {
-        newText.write('(' + text.substring(0, 2) + ') ');
-        if (selectionIndex >= 2) selectionIndex += 3;
-      }
-      if (text.length >= 7) {
-        newText.write(text.substring(2, 7) + '-');
-        if (selectionIndex >= 7) selectionIndex++;
-      }
-      if (text.length >= 11) {
-        newText.write(text.substring(7, 11));
-      }
-      return TextEditingValue(
-        text: newText.toString(),
-        selection: TextSelection.collapsed(offset: selectionIndex),
-      );
+    String text = newValue.text.replaceAll(RegExp(r'\D'), ''); // Remove caracteres não numéricos
+    if (text.length > 11) {
+      text = text.substring(0, 11); // Limita a 11 dígitos
     }
-    return oldValue;
+    // Formatação do telefone: (00) 00000-0000
+    String formattedText = '';
+    if (text.length > 2) {
+      formattedText += '(${text.substring(0, 2)}) ';
+      if (text.length > 6) {
+        formattedText += '${text.substring(2, 7)}-${text.substring(7, 11)}';
+      } else if (text.length > 2) {
+        formattedText += text.substring(2);
+      }
+    } else if (text.length > 0) {
+      formattedText += '(${text.substring(0, 2)})';
+    }
+    return TextEditingValue(text: formattedText, selection: TextSelection.collapsed(offset: formattedText.length));
   }
 }

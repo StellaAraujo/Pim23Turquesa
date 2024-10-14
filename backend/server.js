@@ -9,10 +9,11 @@ const franquiasRoute = require('./routes/franquias_route');
 const userRoutes = require('./routes/user_route');
 const services_route= require('./routes/services_route');
 const { register } = require('./controllers/userController');
+const profissionaisRouter = require('./routes/profissionais_route');
 
 dotenv.config();
 
-// Substitua pela URL de conexão do seu MongoDB Atlas
+// URL de conexão com o  MongoDB Atlas
 mongoose.connect('mongodb+srv://stellaaraujo:PimTurquesa@clusterpim.0v20e.mongodb.net/?retryWrites=true&w=majority&appName=ClusterPIM',{
 }).then(() => {
   console.log('Conectado ao MongoDB Atlas');
@@ -23,13 +24,33 @@ mongoose.connect('mongodb+srv://stellaaraujo:PimTurquesa@clusterpim.0v20e.mongod
 // Middleware para lidar com JSON
 app.use(express.json());
 
-// Usa a rota de franquias
+// routes
 app.use('/franquias', franquiasRoute);
 app.use('/user', userRoutes);
 app.use('/services',services_route);
+app.use('/profissionais', profissionaisRouter);
 
-
-// Servidor escutando na porta 3000
+// Resposta de funcionamento do servidor (servidor rodando na porta 3000)
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
+});
+
+// Rota para receber avaliações
+app.post('/avaliacao', async (req, res) => {
+  const { userId, notaServico, notaProfissional, notaUnidade } = req.body;
+
+  try {
+    const novaAvaliacao = new Avaliacao({
+      userId,
+      notaServico,
+      notaProfissional,
+      notaUnidade,
+    });
+
+    await novaAvaliacao.save();
+    res.status(201).json({ message: 'Avaliação enviada com sucesso' });
+  } catch (error) {
+    console.error('Erro ao salvar avaliação:', error);
+    res.status(500).json({ message: 'Erro ao salvar avaliação', error });
+  }
 });

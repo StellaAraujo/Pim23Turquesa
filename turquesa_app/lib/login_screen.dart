@@ -1,5 +1,6 @@
+// LOGIN_SCREEN.DART
+
 import 'package:flutter/material.dart';
-import 'package:turquesa_app/franquias_screen.dart';
 import 'package:turquesa_app/home_screen.dart';
 import 'register_screen.dart'; // Importa a tela de Registro
 import 'dart:convert'; // Para converter dados para JSON
@@ -7,8 +8,9 @@ import 'package:http/http.dart' as http; // Para fazer requisições HTTP
 
 class LoginPage extends StatefulWidget {
   final String? franquiaId; // Parâmetro opcional
+  final http.Client? httpClient;
 
-  LoginPage({this.franquiaId}); // Construtor atualizado
+  LoginPage({this.franquiaId, this.httpClient}); // Construtor atualizado
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -21,13 +23,11 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // Função para autenticar o usuário
+  // Função para autenticar o acesso do usuário
   Future<void> _authenticateUser() async {
     final String email = _emailController.text;
     final String password = _passwordController.text;
-
-    const String url =
-        'http://localhost:3000/user/login'; // URL da sua API de login
+    const String url = 'http://192.168.15.12:3000/user/login';
 
     if (!mounted) return;
 
@@ -42,24 +42,35 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (response.statusCode == 200) {
-        // Se a autenticação for bem-sucedida
+        final responseData = jsonDecode(response.body);
+        String token = responseData['token']; // Pega o token
+        String userName = responseData['name'] ?? 'Usuário'; // Se 'name' for null, usa "Usuário" como fallback
+        String userId = responseData['userId'];
+        String userPhone = responseData['phone'] ?? ''; // Recupere o telefone
+
+        // Mostrando uma mensagem de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login realizado com sucesso!')),
         );
 
-        // Navega para a tela de Home
+        // Navegando para a tela Home e passando o nome do usuário, email e telefone
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              userName: userName, 
+              userEmail: email,
+              userId: userId,
+              userPhone: userPhone,
+            ),
+          ),
         );
       } else {
-        // Se as credenciais estiverem erradas
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Email ou senha inválidos')),
         );
       }
     } catch (e) {
-      // Tratamento de erros
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: $e')),
       );

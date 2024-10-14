@@ -1,3 +1,5 @@
+//models/franquias.js
+
 const mongoose = require('mongoose');
 
 // Definir o esquema da franquia
@@ -6,6 +8,7 @@ const FranquiaSchema = new mongoose.Schema({
   endereco: { type: String, required: true },
   horario: { type: String, required: true },
   imagemUrl: { type: String, required: true },
+  profissionais: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Profissional' }],
 });
 
 // Criar o modelo

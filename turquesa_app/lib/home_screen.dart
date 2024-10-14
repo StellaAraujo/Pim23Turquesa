@@ -1,8 +1,60 @@
 import 'package:flutter/material.dart';
 import 'service_details_page.dart';
+import 'profile_screen.dart';
 import 'package:turquesa_app/services_api.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  final String userName;
+  final String userEmail;
+  final String userId;
+  final String userPhone;
+
+  HomePage({required this.userName, required this.userEmail, required this.userId, required this.userPhone});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  bool _isAnimating = false; // Para verificar se a animação está em execução
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _animation = Tween<double>(begin: 1.0, end: 1.5).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    // Iniciar a animação ao carregar a tela
+    _animateNotificationIcon();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateNotificationIcon() {
+    if (!_isAnimating) {
+      _isAnimating = true; // Impede que a animação seja acionada novamente
+      _controller.forward().then((_) {
+        _controller.reverse();
+        _isAnimating = false; // Permite que a animação possa ser acionada novamente
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,25 +64,27 @@ class HomePage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 125, 177, 171),
         elevation: 0,
         title: Text(
-          "Hello, Usuário.",
-          style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
+          "Hello, ${widget.userName}.",
+          style: TextStyle(
+              color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Navegar para a tela de notificações
-              Navigator.pushNamed(context, '/notifications');
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _animation.value,
+                child: IconButton(
+                  icon: Icon(Icons.notifications),
+                  onPressed: () {
+                    _animateNotificationIcon(); // Disparar a animação ao clicar
+                    // Navegar para a tela de notificações
+                    Navigator.pushNamed(context, '/notifications');
+                  },
+                ),
+              );
             },
           ),
-          /*Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                "https://via.placeholder.com/150", // Substitua pela URL da imagem do usuário
-              ),
-            ),
-          )*/
         ],
       ),
       body: SingleChildScrollView(
@@ -108,57 +162,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            /* Beauty Specialists
-            SizedBox(height: 20), // Espaço entre ofertas e especialistas
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Beauty Specialists",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // Navega para a tela de especialistas detalhados
-                      Navigator.pushNamed(context, '/specialists');
-                    },
-                    child: Text("See All", style: TextStyle(color: Colors.teal)),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              height: 160,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildSpecialistCard(
-                      "https://img.bebeautiful.in/www-bebeautiful-in/69f66d07ad95469820313b081edaefe1.jpeg?w=300",
-                      "Alicia Silva",
-                      "4.0",
-                      context),
-                  _buildSpecialistCard(
-                      "https://static.wixstatic.com/media/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg/v1/fill/w_469,h_505,al_c,q_80,enc_auto/801e12_3d6648c5f65149d09cb1ef8a0769cc47~mv2.jpg",
-                      "Cara Sweet",
-                      "5.0",
-                      context),
-                  _buildSpecialistCard(
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTAukAh40bF3kRrYfug8HzH7MtOw5KB8nHe4oPeXX8F4EvwMYgRqFGY8iOcZlu4h9lMCs&usqp=CAU",
-                      "Tonya Jey",
-                      "4.5",
-                      context),
-                  _buildSpecialistCard(
-                      "https://images.ctfassets.net/wlke2cbybljx/2HgQtNM4ViNmRVW6owS0ZU/1b25349ae9c87afc6a6aff0a65bff1e0/037_220024_HOLLYWOOD-PINK-REDS_HM_SOLO-JORDAN-CANDY-CHIC_RM_2308.jpg?fm=jpg",
-                      "Tonya Jey",
-                      "4.5",
-                      context),
-                ],
-              ),
-            ),*/
-
             // Dicas de Beleza
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -190,11 +193,20 @@ class HomePage extends StatelessWidget {
           switch (index) {
             case 0:
               // Navegar para a tela Home
-              Navigator.pushNamed(context, '/');
+              Navigator.pushNamed(context, '/home');
               break;
             case 1:
-              // Navegar para a tela Profile
-              Navigator.pushNamed(context, '/profile');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(
+                    userName: widget.userName, // Passe o nome do usuário
+                    userEmail: widget.userEmail,
+                    userId: widget.userId,
+                    userPhone: widget.userPhone,// Passe o e-mail do usuário
+                  ),
+                ),
+              );
               break;
           }
         },
@@ -251,37 +263,15 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  /* Método para construir o card de especialista
-  Widget _buildSpecialistCard(String imageUrl, String name, String rating, BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        children: [
-          Expanded(
-            child: Image.network(imageUrl, fit: BoxFit.cover),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              name,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Text('Rating: $rating', style: TextStyle(color: Colors.grey)),
-        ],
-      ),
-    );
-  }*/
-
   // Método para construir o card de dica
   Widget _buildTipCard(IconData icon, String title, String description) {
-  return Card(
-    child: ListTile(
-      leading: Icon(icon, size: 40, color: Color.fromARGB(255, 125, 177, 171)), // Aqui você coloca o ícone
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-      subtitle: Text(description),
-    ),
-  );
-}
+    return Card(
+      child: ListTile(
+        leading: Icon(icon,
+            size: 40, color: Color.fromARGB(255, 122, 184, 178)), // Ícone
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(description),
+      ),
+    );
+  }
 }

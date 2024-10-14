@@ -1,24 +1,37 @@
-//franquias_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'agendamento_final_screen.dart';
 
+// Modelo da Franquia
 class Franquia {
+  final String id; // Adicionado para armazenar o id gerado pelo MongoDB
   final String nome;
   final String imageUrl;
   final String address;
   final String hours;
 
   Franquia({
+    required this.id, // Agora id é um parâmetro obrigatório
     required this.nome,
     required this.imageUrl,
     required this.address,
     required this.hours,
   });
+
+  // Método para criar uma instância de Franquia a partir do JSON
+  factory Franquia.fromJson(Map<String, dynamic> json) {
+    return Franquia(
+      id: json['_id'], // Usando o campo _id do MongoDB
+      nome: json['nome'],
+      imageUrl: json['imagemUrl'],
+      address: json['endereco'],
+      hours: json['horario'],
+    );
+  }
 }
 
+// Card para exibir informações da Franquia
 class FranquiaCard extends StatelessWidget {
   final Franquia franquia;
 
@@ -51,7 +64,7 @@ class FranquiaCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    franquia.nome,  // Exibe o nome da franquia
+                    franquia.nome,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -83,6 +96,7 @@ class FranquiaCard extends StatelessWidget {
   }
 }
 
+// Tela de Franquias
 class FranquiasScreen extends StatefulWidget {
   final dynamic selectedService;
 
@@ -102,18 +116,14 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
     fetchFranquias();
   }
 
+  // Função para buscar as franquias
   Future<void> fetchFranquias() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/franquias'));
+    final response = await http.get(Uri.parse('http://192.168.15.12:3000/franquias'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
-        franquias = data.map((franquia) => Franquia(
-          nome: franquia['nome'],
-          imageUrl: franquia['imagemUrl'],  
-          address: franquia['endereco'],      
-          hours: franquia['horario'],         
-        )).toList();
+        franquias = data.map((franquia) => Franquia.fromJson(franquia)).toList(); // Usando fromJson
         isLoading = false;
       });
     } else {
@@ -132,7 +142,7 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
-               Container(
+                Container(
                   padding: EdgeInsets.all(16.0),
                   child: Image.network(
                     'https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png',
@@ -166,26 +176,6 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
                 ),
               ],
             ),
-    );
-  }
-}
-
-// Defina a classe AgendamentoScreen aqui ou importe-a se estiver em um arquivo separado.
-class AgendamentoScreen extends StatelessWidget {
-  final Franquia franquia;
-  final dynamic servico;
-
-  AgendamentoScreen({required this.franquia, required this.servico});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Agendar Serviço'),
-      ),
-      body: Center(
-        child: Text('Agendando ${servico} para ${franquia.nome}'),
-      ),
     );
   }
 }

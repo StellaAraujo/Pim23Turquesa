@@ -1,12 +1,78 @@
+//profile_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:turquesa_app/apresentacao_screen.dart';
+import 'profile_editar.dart';
 
 class ProfileScreen extends StatelessWidget {
+  final String userName; // Variável para o nome do usuário
+  final String userEmail; // Variável para o e-mail do usuário
+  final String userId;
+  final String userPhone;
+
+  ProfileScreen({required this.userName, required this.userEmail, required this.userId, required this.userPhone});
+
+  // Função para fazer o logout
+  Future<void> _logout(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Remover os dados de login do armazenamento local
+    await prefs.remove('userName');
+    await prefs.remove('userEmail');
+    await prefs.remove('userId');
+    await prefs.remove('userPhone');
+
+    // Navegar para a tela de apresentação (sem possibilidade de voltar)
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+          builder: (context) => AboutUsScreen()), // Sua tela de login/apresentação
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  // Função para exibir a confirmação de logout
+  Future<void> _showLogoutConfirmation(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // O usuário precisa confirmar ou cancelar
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar logout: '),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Você deseja deslogar?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o diálogo
+              },
+            ),
+            TextButton(
+              child: Text('Deslogar'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o diálogo
+                _logout(context); // Faz o logout
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        title: Text("Profile"),
+        backgroundColor: Color.fromARGB(255, 125, 177, 171),
+        title: Text("Perfil de $userName", style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -20,11 +86,12 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage("https://via.placeholder.com/150"),
+                    backgroundImage:
+                        NetworkImage("https://img.freepik.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg"),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Usuário",
+                    userName,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -32,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    "usuario@exemplo.com",
+                    userEmail,
                     style: TextStyle(
                       color: Colors.grey[600],
                     ),
@@ -40,11 +107,22 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Lógica para editar perfil
+                      // Navegar para a tela de edição de perfil
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProfileScreen(
+                            userName: userName, // Passe o nome do usuário
+                            userEmail: userEmail,
+                            userId: userId,
+                            userPhone: userPhone, // Passe o e-mail do usuário
+                          ),
+                        ),
+                      );
                     },
-                    child: Text("Edit Profile"),
+                    child: Text("Editar perfil"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                      backgroundColor: const Color.fromARGB(255, 149, 171, 171),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -73,11 +151,11 @@ class ProfileScreen extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Lógica para logout
+                  _showLogoutConfirmation(context); // Chama o diálogo de confirmação
                 },
-                child: Text("Logout"),
+                child: Text("Sair"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: const Color.fromARGB(198, 244, 67, 54),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -94,7 +172,8 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildServiceHistoryItem(String service, String status, String date) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 8.0),
-      leading: Icon(Icons.check_circle, color: status == "Completed" ? Colors.green : Colors.orange),
+      leading: Icon(Icons.check_circle,
+          color: status == "Completed" ? Colors.green : Colors.orange),
       title: Text(service),
       subtitle: Text("Status: $status"),
       trailing: Text(date),
