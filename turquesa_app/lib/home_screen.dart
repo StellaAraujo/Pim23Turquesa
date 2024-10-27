@@ -234,6 +234,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               builder: (context) => ServiceDetailsPage(
                 categoryName: categoryName,
                 subcategories: subcategories,
+                userId: widget.userId,       // Passe o ID do usuário
+                userEmail: widget.userEmail, // Passe o e-mail do usuário
+                userName: widget.userName,   
               ),
             ),
           );

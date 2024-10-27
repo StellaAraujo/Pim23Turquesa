@@ -99,8 +99,19 @@ class FranquiaCard extends StatelessWidget {
 // Tela de Franquias
 class FranquiasScreen extends StatefulWidget {
   final dynamic selectedService;
+  final String categoryName; // Novo parâmetro adicionado
+  final String userId;       // Novo parâmetro adicionado
+  final String userEmail;    // Novo parâmetro adicionado
+  final String userName;     // Novo parâmetro adicionado
 
-  FranquiasScreen({Key? key, required this.selectedService}) : super(key: key);
+  FranquiasScreen({
+    Key? key,
+    required this.selectedService,
+    required this.categoryName,
+    required this.userId,
+    required this.userEmail,
+    required this.userName,
+  }) : super(key: key);
 
   @override
   _FranquiasScreenState createState() => _FranquiasScreenState();
@@ -151,7 +162,7 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding:  EdgeInsets.all(16.0),
                     child: ListView.builder(
                       itemCount: franquias.length,
                       itemBuilder: (context, index) {
@@ -164,6 +175,10 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
                                 builder: (context) => AgendamentoFinalScreen(
                                   franquia: franquias[index],
                                   servico: widget.selectedService,
+                                  categoryName: widget.categoryName,
+                                  userId: widget.userId,        // Passe o ID do usuário
+                                  userEmail: widget.userEmail,  // Passe o e-mail do usuário
+                                  userName: widget.userName,    // Passe o nome do usuário
                                 ),
                               ),
                             );

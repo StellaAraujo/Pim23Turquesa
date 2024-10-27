@@ -1,19 +1,23 @@
-//service_details_page.dart
-
 import 'package:flutter/material.dart';
 import 'franquias_screen.dart';
 
 class ServiceDetailsPage extends StatelessWidget {
   final String categoryName;
+  final String userName;
+  final String userEmail;
+  final String userId;
   final List<dynamic> subcategories;
 
-  ServiceDetailsPage({required this.categoryName, required this.subcategories});
+  ServiceDetailsPage({required this.categoryName, required this.subcategories, required this.userName, required this.userEmail, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Serviços de $categoryName:', style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold ),),
+        title: Text(
+          'Serviços de $categoryName:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color.fromARGB(255, 125, 177, 171), // Cor de fundo
       ),
       body: Padding(
@@ -24,11 +28,17 @@ class ServiceDetailsPage extends StatelessWidget {
             final service = subcategories[index];
             return GestureDetector(
               onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FranquiasScreen(selectedService: service),
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FranquiasScreen(
+                    selectedService: service,
+                    categoryName: categoryName, 
+                    userEmail: userEmail,
+                    userId: userId,
+                    userName: userName,// Corrigido para passar corretamente o parâmetro
                   ),
                 ),
+              ),
               child: Card(
                 margin: EdgeInsets.symmetric(vertical: 10.0),
                 elevation: 5,

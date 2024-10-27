@@ -33,7 +33,11 @@ class TurquesaApp extends StatelessWidget {
         '/notifications': (context) => NotificationsPage(),  // Tela de Notificações
         '/services': (context) => ServiceDetailsPage(   // Tela de Serviços Detalhados
           categoryName: 'Cabelo',  // Passe um valor inicial se necessário
-          subcategories: [],       // Inicialize a lista como vazia
+          subcategories: [],  
+          userEmail: '',
+          userId: '',
+          userName: '',
+               // Inicialize a lista como vazia
         ),
       },
     );
