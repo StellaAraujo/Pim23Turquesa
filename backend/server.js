@@ -10,6 +10,9 @@ const userRoutes = require('./routes/user_route');
 const services_route= require('./routes/services_route');
 const { register } = require('./controllers/userController');
 const profissionaisRouter = require('./routes/profissionais_route');
+const agendamentoRoutes = require('./routes/agendamento_route'); // Verifique o caminho correto para o arquivo
+const horariosRoutes = require('./routes/horarios_route');
+
 
 dotenv.config();
 
@@ -29,6 +32,8 @@ app.use('/franquias', franquiasRoute);
 app.use('/user', userRoutes);
 app.use('/services',services_route);
 app.use('/profissionais', profissionaisRouter);
+app.use('/agendamentos', agendamentoRoutes);
+app.use('/disponibilidade', horariosRoutes );
 
 // Resposta de funcionamento do servidor (servidor rodando na porta 3000)
 app.listen(port, () => {

@@ -1,17 +1,14 @@
-//profile_screen.dart
+// profile_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:turquesa_app/apresentacao_screen.dart';
 import 'profile_editar.dart';
+import 'user_session.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final String userName; // Variável para o nome do usuário
-  final String userEmail; // Variável para o e-mail do usuário
-  final String userId;
-  final String userPhone;
-
-  ProfileScreen({required this.userName, required this.userEmail, required this.userId, required this.userPhone});
+  // O construtor não precisa mais receber os parâmetros
+  ProfileScreen();
 
   // Função para fazer o logout
   Future<void> _logout(BuildContext context) async {
@@ -69,10 +66,16 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Acessa os dados do usuário diretamente da UserSession
+    String userName = UserSession.userName;
+    String userEmail = UserSession.userEmail;
+    String userId = UserSession.userId;
+    String userPhone = UserSession.userPhone;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 125, 177, 171),
-        title: Text("Perfil de $userName", style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),),
+        title: Text("Perfil de $userName", style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -86,8 +89,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage:
-                        NetworkImage("https://img.freepik.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg"),
+                    backgroundImage: NetworkImage("https://img.freepik.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg"),
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -135,16 +137,16 @@ class ProfileScreen extends StatelessWidget {
 
             // Histórico de Serviços
             Text(
-              "Service History",
+              "Histórico de Serviços",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 10),
-            _buildServiceHistoryItem("Haircut", "Completed", "25 Sep 2023"),
-            _buildServiceHistoryItem("Spa", "Upcoming", "30 Sep 2023"),
-            _buildServiceHistoryItem("Make Up", "Completed", "10 Sep 2023"),
+            _buildServiceHistoryItem("Corte de Cabelo", "Concluído", "25 Set 2023"),
+            _buildServiceHistoryItem("Spa", "Próximo", "30 Set 2023"),
+            _buildServiceHistoryItem("Maquiagem", "Concluído", "10 Set 2023"),
             SizedBox(height: 20),
 
             // Botão de Logout
@@ -172,8 +174,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildServiceHistoryItem(String service, String status, String date) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 8.0),
-      leading: Icon(Icons.check_circle,
-          color: status == "Completed" ? Colors.green : Colors.orange),
+      leading: Icon(Icons.check_circle, color: status == "Concluído" ? Colors.green : Colors.orange),
       title: Text(service),
       subtitle: Text("Status: $status"),
       trailing: Text(date),

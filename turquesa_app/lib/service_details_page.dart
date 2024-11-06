@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'franquias_screen.dart';
+import 'user_session.dart'; // Importando o UserSession
 
 class ServiceDetailsPage extends StatelessWidget {
   final String categoryName;
-  final String userName;
-  final String userEmail;
-  final String userId;
   final List<dynamic> subcategories;
 
-  ServiceDetailsPage({required this.categoryName, required this.subcategories, required this.userName, required this.userEmail, required this.userId});
+  ServiceDetailsPage({required this.categoryName, required this.subcategories});
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +31,10 @@ class ServiceDetailsPage extends StatelessWidget {
                   builder: (context) => FranquiasScreen(
                     selectedService: service,
                     categoryName: categoryName, 
-                    userEmail: userEmail,
-                    userId: userId,
-                    userName: userName,// Corrigido para passar corretamente o parâmetro
+                    userEmail: UserSession.userEmail, // Usando variável global
+                    userId: UserSession.userId,       // Usando variável global
+                    userName: UserSession.userName,   // Usando variável global
+                    userPhone: UserSession.userPhone, // Usando variável global
                   ),
                 ),
               ),

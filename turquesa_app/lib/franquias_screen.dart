@@ -103,6 +103,7 @@ class FranquiasScreen extends StatefulWidget {
   final String userId;       // Novo parâmetro adicionado
   final String userEmail;    // Novo parâmetro adicionado
   final String userName;     // Novo parâmetro adicionado
+  final String userPhone;
 
   FranquiasScreen({
     Key? key,
@@ -111,6 +112,7 @@ class FranquiasScreen extends StatefulWidget {
     required this.userId,
     required this.userEmail,
     required this.userName,
+    required this.userPhone,
   }) : super(key: key);
 
   @override
@@ -129,7 +131,7 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
 
   // Função para buscar as franquias
   Future<void> fetchFranquias() async {
-    final response = await http.get(Uri.parse('http://192.168.15.12:3000/franquias'));
+    final response = await http.get(Uri.parse('http://localhost:3000/franquias'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -178,7 +180,8 @@ class _FranquiasScreenState extends State<FranquiasScreen> {
                                   categoryName: widget.categoryName,
                                   userId: widget.userId,        // Passe o ID do usuário
                                   userEmail: widget.userEmail,  // Passe o e-mail do usuário
-                                  userName: widget.userName,    // Passe o nome do usuário
+                                  userName: widget.userName, 
+                                  userPhone: widget.userPhone,  // Passe o nome do usuário
                                 ),
                               ),
                             );

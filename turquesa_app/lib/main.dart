@@ -21,24 +21,19 @@ class TurquesaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.teal,
-        fontFamily: 'Sansita', // Certifique-se de que a fonte 'Sansita' está incluída no projeto
+        fontFamily: 'Sansita', 
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => AboutUsScreen(),           // Tela "Sobre Nós"
+        '/': (context) => AboutUsScreen (),           // Tela "Sobre Nós"
         '/login': (context) => LoginPage(),          // Tela de Login
-        '/home': (context) => HomePage(userName: 'Default User', userEmail: 'Default Email', userId: 'Default ID', userPhone: 'Default Phone'),            // Tela Home
+        '/home': (context) => HomePage(),            // Tela Home
         '/register': (context) => RegisterPage(),    // Tela de Registro
-        '/profile': (context) => ProfileScreen(userName: 'Default User', userEmail: 'Default Email', userId: 'Default ID', userPhone: 'Default Phone'),    // Tela de Perfil
+        '/profile': (context) => ProfileScreen(),    // Tela de Perfil
         '/notifications': (context) => NotificationsPage(),  // Tela de Notificações
         '/services': (context) => ServiceDetailsPage(   // Tela de Serviços Detalhados
-          categoryName: 'Cabelo',  // Passe um valor inicial se necessário
-          subcategories: [],  
-          userEmail: '',
-          userId: '',
-          userName: '',
-               // Inicialize a lista como vazia
-        ),
+          categoryName: 'Cabelo',  
+          subcategories: []),
       },
     );
   }

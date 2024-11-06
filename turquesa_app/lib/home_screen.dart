@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 import 'service_details_page.dart';
 import 'profile_screen.dart';
 import 'package:turquesa_app/services_api.dart';
+import 'user_session.dart'; // Certifique-se de ter as variáveis globais definidas neste arquivo
 
 class HomePage extends StatefulWidget {
-  final String userName;
-  final String userEmail;
-  final String userId;
-  final String userPhone;
-
-  HomePage({required this.userName, required this.userEmail, required this.userId, required this.userPhone});
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -18,7 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isAnimating = false; // Para verificar se a animação está em execução
+  bool _isAnimating = false;
 
   @override
   void initState() {
@@ -47,10 +41,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   void _animateNotificationIcon() {
     if (!_isAnimating) {
-      _isAnimating = true; // Impede que a animação seja acionada novamente
+      _isAnimating = true;
       _controller.forward().then((_) {
         _controller.reverse();
-        _isAnimating = false; // Permite que a animação possa ser acionada novamente
+        _isAnimating = false;
       });
     }
   }
@@ -64,7 +58,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         backgroundColor: const Color.fromARGB(255, 125, 177, 171),
         elevation: 0,
         title: Text(
-          "Hello, ${widget.userName}.",
+          "Hello, ${UserSession.userName}",
           style: TextStyle(
               color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
         ),
@@ -77,8 +71,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 child: IconButton(
                   icon: Icon(Icons.notifications),
                   onPressed: () {
-                    _animateNotificationIcon(); // Disparar a animação ao clicar
-                    // Navegar para a tela de notificações
+                    _animateNotificationIcon();
                     Navigator.pushNamed(context, '/notifications');
                   },
                 ),
@@ -91,23 +84,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Espaço para logo
             SizedBox(height: 20),
             Center(
               child: Image.network(
-                "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png", // Substitua pela URL da logo
+                "https://turquesaesmalteria.com.br/wp-content/uploads/2020/07/Logo-Turquesa-Horizontal.png",
                 height: 100,
               ),
             ),
-            SizedBox(height: 16), // Espaçamento após a logo
-
-            // Cards de serviços (grid)
+            SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Cabeçalho da seção
                   Text(
                     'Serviços:',
                     style: TextStyle(
@@ -115,16 +104,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(
-                      height: 16.0), // Espaçamento entre o título e os cards
-
-                  // Grid de cards de serviços
+                  SizedBox(height: 16.0),
                   GridView.count(
-                    crossAxisCount: 3, // 3 cards por linha
+                    crossAxisCount: 3,
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(), // Impede rolagem
-                    childAspectRatio:
-                        0.85, // Proporção da altura para a largura
+                    physics: NeverScrollableScrollPhysics(),
+                    childAspectRatio: 0.85,
                     children: [
                       _buildCategoryCard(
                         "https://kproserragaucha.com.br/wp-content/uploads/2022/10/Untitled-1-1.jpg",
@@ -161,11 +146,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ],
               ),
             ),
-
-            // Dicas de Beleza
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0, vertical: 16.0), // Aumentar espaço acima
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Text(
                 "Dicas de Beleza:",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -174,11 +156,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             Column(
               children: [
                 _buildTipCard(
-                    Icons.local_drink, // Ícone para a dica
+                    Icons.local_drink,
                     "Hidratação é Fundamental",
                     "Beba bastante água todos os dias."),
                 _buildTipCard(
-                    Icons.wb_sunny, // Ícone para a dica
+                    Icons.wb_sunny,
                     "Cuide da Sua Pele",
                     "Use protetor solar diariamente."),
               ],
@@ -189,22 +171,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (int index) {
-          // Verifica qual item foi clicado e navega para a respectiva tela
           switch (index) {
             case 0:
-              // Navegar para a tela Home
               Navigator.pushNamed(context, '/home');
               break;
             case 1:
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
-                    userName: widget.userName, // Passe o nome do usuário
-                    userEmail: widget.userEmail,
-                    userId: widget.userId,
-                    userPhone: widget.userPhone,// Passe o e-mail do usuário
-                  ),
+                  builder: (context) => ProfileScreen(),
                 ),
               );
               break;
@@ -218,30 +193,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  // Método para construir o card de categoria
   Widget _buildCategoryCard(
       String imageUrl, String categoryName, BuildContext context) {
     return GestureDetector(
       onTap: () async {
         try {
-          // Chama a função de requisição para buscar subcategorias da categoria selecionada
           var subcategories = await ServicesAPI.getSubcategories(categoryName);
-
-          // Navega para a tela de detalhes com as subcategorias recebidas
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ServiceDetailsPage(
                 categoryName: categoryName,
                 subcategories: subcategories,
-                userId: widget.userId,       // Passe o ID do usuário
-                userEmail: widget.userEmail, // Passe o e-mail do usuário
-                userName: widget.userName,   
               ),
             ),
           );
         } catch (e) {
-          // Se ocorrer algum erro, mostra uma mensagem no console
           print('Erro ao carregar subcategorias: $e');
         }
       },
@@ -266,13 +233,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  // Método para construir o card de dica
   Widget _buildTipCard(IconData icon, String title, String description) {
     return Card(
       child: ListTile(
         leading: Icon(icon,
-            size: 40, color: Color.fromARGB(255, 122, 184, 178)), // Ícone
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+            size: 40, color: Color.fromARGB(255, 122, 184, 178)),
+        title: Text(title),
         subtitle: Text(description),
       ),
     );

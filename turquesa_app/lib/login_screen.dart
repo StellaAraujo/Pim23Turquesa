@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:turquesa_app/home_screen.dart';
+import 'user_session.dart'; // Importa a sessão do usuário
 import 'register_screen.dart'; // Importa a tela de Registro
 import 'dart:convert'; // Para converter dados para JSON
 import 'package:http/http.dart' as http; // Para fazer requisições HTTP
@@ -27,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _authenticateUser() async {
     final String email = _emailController.text;
     final String password = _passwordController.text;
-    const String url = 'http://192.168.15.12:3000/user/login';
+    const String url = 'http://localhost:3000/user/login';
 
     if (!mounted) return;
 
@@ -48,21 +49,22 @@ class _LoginPageState extends State<LoginPage> {
         String userId = responseData['userId'];
         String userPhone = responseData['phone'] ?? ''; // Recupere o telefone
 
+        // Armazenando as informações do usuário nas variáveis globais
+        UserSession.userName = userName;
+        UserSession.userEmail = email;
+        UserSession.userId = userId;
+        UserSession.userPhone = userPhone;
+
         // Mostrando uma mensagem de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login realizado com sucesso!')),
         );
 
-        // Navegando para a tela Home e passando o nome do usuário, email e telefone
+        // Navegando para a tela Home
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(
-              userName: userName, 
-              userEmail: email,
-              userId: userId,
-              userPhone: userPhone,
-            ),
+            builder: (context) => HomePage(),
           ),
         );
       } else {
