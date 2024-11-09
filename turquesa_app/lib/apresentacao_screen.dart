@@ -31,9 +31,9 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             ),
             SizedBox(height: 16),
             Container(
-              height: screenHeight * 0.4, // Defina a altura do card
+              height: screenHeight * 0.4, 
               child: PageView(
-                controller: _pageController, // Definindo o controlador
+                controller: _pageController,
                 children: [
                   _buildCard(
                     'A Turquesa Esmalteria e Beleza é uma rede de franquias dedicada a oferecer excelência em cuidados de beleza. Fundada com a missão de proporcionar uma experiência única e personalizada a cada cliente. Nossa marca é sinônimo de inovação, qualidade e bem-estar, sempre buscando a satisfação dos clientes.',

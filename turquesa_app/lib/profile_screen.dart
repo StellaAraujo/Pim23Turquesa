@@ -1,14 +1,73 @@
-// profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:turquesa_app/apresentacao_screen.dart';
 import 'profile_editar.dart';
 import 'user_session.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class ProfileScreen extends StatelessWidget {
-  // O construtor não precisa mais receber os parâmetros
-  ProfileScreen();
+class ProfileScreen extends StatefulWidget {
+  ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  List<dynamic> agendamentos = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAgendamentos(); // Carregar os agendamentos ao iniciar
+  }
+
+  // Função para buscar os agendamentos do usuário
+  Future<void> _fetchAgendamentos() async {
+  String userId = UserSession.userId;
+  try {
+    final response = await http
+        .get(Uri.parse('http://localhost:3000/agendamentos/$userId'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        // Decodifica o JSON e ordena por data
+        agendamentos = json.decode(response.body)
+          ..sort((a, b) {
+            DateTime dataA = DateTime.parse(a['data']);
+            DateTime dataB = DateTime.parse(b['data']);
+            return dataA.compareTo(dataB);
+          });
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print("Erro na requisição: ${response.statusCode}");
+      print("Corpo da resposta: ${response.body}");
+      throw Exception('Erro ao carregar agendamentos');
+    }
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+    print("Erro na requisição: $e");
+    throw Exception('Erro ao carregar agendamentos');
+  }
+}
+
+  // Função para formatar a data para o formato DD-MM-YYYY
+  String formatarData(String dataOriginal) {
+    try {
+      DateTime dateTime = DateTime.parse(dataOriginal);
+      return DateFormat('dd-MM-yyyy').format(dateTime);
+    } catch (e) {
+      return dataOriginal; // Retorna o valor original em caso de erro
+    }
+  }
 
   // Função para fazer o logout
   Future<void> _logout(BuildContext context) async {
@@ -23,8 +82,7 @@ class ProfileScreen extends StatelessWidget {
     // Navegar para a tela de apresentação (sem possibilidade de voltar)
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-          builder: (context) => AboutUsScreen()), // Sua tela de login/apresentação
+      MaterialPageRoute(builder: (context) => AboutUsScreen()),
       (Route<dynamic> route) => false,
     );
   }
@@ -33,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // O usuário precisa confirmar ou cancelar
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Confirmar logout: '),
@@ -66,7 +124,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Acessa os dados do usuário diretamente da UserSession
     String userName = UserSession.userName;
     String userEmail = UserSession.userEmail;
     String userId = UserSession.userId;
@@ -75,7 +132,9 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 125, 177, 171),
-        title: Text("Perfil de $userName", style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16)),
+        title: Text("Perfil de $userName",
+            style: TextStyle(
+                color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -89,7 +148,8 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage("https://img.freepik.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg"),
+                    backgroundImage: NetworkImage(
+                        "https://img.freepik.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg"),
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -109,15 +169,14 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Navegar para a tela de edição de perfil
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditProfileScreen(
-                            userName: userName, // Passe o nome do usuário
+                            userName: userName,
                             userEmail: userEmail,
                             userId: userId,
-                            userPhone: userPhone, // Passe o e-mail do usuário
+                            userPhone: userPhone,
                           ),
                         ),
                       );
@@ -133,27 +192,57 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 60),
+            Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // Adiciona o título "Meus agendamentos"
+    Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Text(
+        "Meus agendamentos: ",
+        style: TextStyle(
+          fontSize: 16,
+         fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+    ),
 
-            // Histórico de Serviços
-            Text(
-              "Histórico de Serviços",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            _buildServiceHistoryItem("Corte de Cabelo", "Concluído", "25 Set 2023"),
-            _buildServiceHistoryItem("Spa", "Próximo", "30 Set 2023"),
-            _buildServiceHistoryItem("Maquiagem", "Concluído", "10 Set 2023"),
-            SizedBox(height: 20),
+            // Exibição dos agendamentos
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : agendamentos.isEmpty
+                    ? Center(child: Text("Você não tem agendamentos"))
+                    : Column(
+                        children: agendamentos.map((agendamento) {
+                          return ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+                            leading:
+                                Icon(Icons.calendar_today, color: Colors.blue),
+                            title: Text(agendamento['name']),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("${agendamento['subcategory']}"),
+                                Text(
+                                    "R\$${agendamento['price']} | Status: ${agendamento['status']}"),
+                              ],
+                            ),
+                            trailing: Text(
+                              "${formatarData(agendamento['data'])} - ${agendamento['hora']}",
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 100),
 
             // Botão de Logout
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _showLogoutConfirmation(context); // Chama o diálogo de confirmação
+                  _showLogoutConfirmation(
+                      context); // Chama o diálogo de confirmação
                 },
                 child: Text("Sair"),
                 style: ElevatedButton.styleFrom(
@@ -166,18 +255,9 @@ class ProfileScreen extends StatelessWidget {
             ),
           ],
         ),
+          ]
+        )
       ),
-    );
-  }
-
-  // Função para construir os itens do histórico de serviços
-  Widget _buildServiceHistoryItem(String service, String status, String date) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 8.0),
-      leading: Icon(Icons.check_circle, color: status == "Concluído" ? Colors.green : Colors.orange),
-      title: Text(service),
-      subtitle: Text("Status: $status"),
-      trailing: Text(date),
     );
   }
 }

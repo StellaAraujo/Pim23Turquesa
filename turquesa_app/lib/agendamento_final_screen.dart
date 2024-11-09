@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // Para formatação de datas
+import 'package:turquesa_app/home_screen.dart';
+import 'package:turquesa_app/profile_screen.dart';
 import 'franquias_screen.dart';
 
 class AgendamentoFinalScreen extends StatefulWidget {
@@ -41,8 +43,8 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
   }
 
   Future<void> _carregarProfissionais() async {
-    final response = await http.get(
-        Uri.parse('http://localhost:3000/profissionais/${widget.franquia.id}'));
+    final response = await http.get(Uri.parse(
+        'http://192.168.15.10:3000/profissionais/${widget.franquia.id}'));
     if (response.statusCode == 200) {
       List<dynamic> allProfissionais = json.decode(response.body);
       setState(() {
@@ -60,10 +62,13 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
   Future<void> _carregarHorariosDisponiveis(
       String profissionalId, DateTime data) async {
     final response = await http.get(Uri.parse(
-        'http://localhost:3000/agendamentos/disponiveis/$profissionalId?data=${DateFormat('yyyy-MM-dd').format(data)}'));
+        'http://192.168.15.10:3000/agendamentos/disponiveis/$profissionalId?data=${DateFormat('yyyy-MM-dd').format(data)}'));
     if (response.statusCode == 200) {
+      List<String> horarios = List<String>.from(json.decode(response.body));
+
       setState(() {
-        horariosDisponiveis = List<String>.from(json.decode(response.body));
+        // Atualiza a lista de horários disponíveis com a resposta da API
+        horariosDisponiveis = horarios;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,23 +105,53 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
       body: json.encode(agendamento),
     );
 
-    if (response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Agendamento realizado com sucesso!')),
-      );
-      Navigator.pop(context); // Voltar para a tela anterior
-    } else if (response.statusCode == 400) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Horário indisponível. Tente outro horário.')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao realizar agendamento.')),
-      );
-    }
+     if (response.statusCode == 201) {
+    // Mostra o popup de confirmação
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Agendamento confirmado!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Serviço: ${widget.servico['name']}'),
+              Text('Profissional: ${profissionalSelecionado['nome']}'),
+              Text('Data: ${DateFormat('dd/MM/yyyy').format(dataSelecionada!)}'),
+              Text('Horário: $horarioSelecionado'),
+              Text('Preço: R\$${widget.servico['price']}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o popup
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                  (Route<dynamic> route) => false,
+                ); // Navega para a tela de perfil
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  } else if (response.statusCode == 400) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Horário indisponível. Tente outro horário.')),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao realizar agendamento.')),
+    );
   }
-
+}
   @override
+  // Código atualizado
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -126,19 +161,21 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
         ),
         backgroundColor: const Color.fromARGB(255, 125, 177, 171),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildServiceCard(),
-            SizedBox(height: 16),
-            Text(
-              'Profissionais disponíveis:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Expanded(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildServiceCard(),
+              SizedBox(height: 16),
+              Text(
+                'Profissionais disponíveis:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Container(
+                height: 200, 
                 child: profissionais.isEmpty
                     ? Center(child: CircularProgressIndicator())
                     : ListView.builder(
@@ -165,56 +202,89 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
                             ),
                           );
                         },
-                      )),
-            SizedBox(height: 16),
-            // Data Picker
-            ElevatedButton(
-              onPressed: () async {
-                DateTime? selectedDate = await showDatePicker(
-                  context: context,
+                      ),
+              ),
+              SizedBox(height: 16),
+              if (profissionalSelecionado != null) ...[
+                Text(
+                  'Selecione uma data:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                CalendarDatePicker(
                   initialDate: DateTime.now(),
-                  firstDate: DateTime(2024),
+                  firstDate: DateTime.now(),
                   lastDate: DateTime(2025),
-                );
-                if (selectedDate != null) {
-                  setState(() {
-                    dataSelecionada = selectedDate;
-                  });
-                  // Carregar os horários para a data selecionada
-                  if (profissionalSelecionado != null) {
+                  onDateChanged: (selectedDate) {
+                    setState(() {
+                      dataSelecionada = selectedDate;
+                    });
                     _carregarHorariosDisponiveis(
                         profissionalSelecionado['_id'], selectedDate);
-                  }
-                }
-              },
-              child: Text(dataSelecionada == null
-                  ? 'Selecione uma data'
-                  : DateFormat('dd/MM/yyyy').format(dataSelecionada!)),
-            ),
-            // Horário Picker
-            SizedBox(height: 16),
-            DropdownButton<String>(
-              hint: Text('Selecione um horário'),
-              value: horarioSelecionado,
-              onChanged: (newValue) {
-                setState(() {
-                  horarioSelecionado = newValue;
-                });
-              },
-              items: horariosDisponiveis.map((horario) {
-                return DropdownMenuItem<String>(
-                  value: horario,
-                  child: Text(horario),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-            // Botão de confirmação de agendamento
-            ElevatedButton(
-              onPressed: _confirmarAgendamento,
-              child: Text('Confirmar Agendamento'),
-            ),
-          ],
+                  },
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Horários disponíveis:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12),
+                if (horariosDisponiveis.isNotEmpty)
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: horariosDisponiveis.length,
+                      itemBuilder: (context, index) {
+                        String horario = horariosDisponiveis[index];
+                        bool isSelected = horarioSelecionado == horario;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              horarioSelecionado = horario;
+                            });
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            margin: EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color.fromARGB(255, 133, 171, 171)
+                                  : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color.fromARGB(144, 162, 196, 192)
+                                    : Colors.grey,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Text(
+                              horario,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Text('Nenhum horário disponível para a data selecionada.'),
+              ],
+              SizedBox(height: 24),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _confirmarAgendamento,
+                  child: Text('Confirmar Agendamento'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -287,52 +357,61 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
     );
   }
 
-  Widget _buildSpecialistCard(String? imageUrl, String? name, String? especialidade, bool isSelected) {
-  return Card(
-    elevation: 4,
-    color: isSelected ? const Color.fromARGB(255, 175, 211, 211): const Color.fromARGB(255, 244, 244, 244), // Efeito de seleção
-    shape: isSelected 
-      ? RoundedRectangleBorder(
-          side: BorderSide(color: const Color.fromARGB(144, 83, 124, 119), width: 2.0), // Borda colorida
-          borderRadius: BorderRadius.circular(8.0),
-        )
-      : RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-    margin: EdgeInsets.symmetric(vertical: 8.0),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: imageUrl != null && imageUrl.isNotEmpty
-                ? Image.network(imageUrl, height: 60, width: 60, fit: BoxFit.cover)
-                : Container(
-                    height: 60,
-                    width: 60,
-                    color: Colors.grey[300],
-                    child: Icon(Icons.person, size: 30, color: const Color.fromARGB(255, 246, 241, 241)),
-                  ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name ?? 'Nome não disponível',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Especialidade: ${especialidade ?? 'Não especificada'}',
-                  style: TextStyle(color: const Color.fromARGB(255, 14, 12, 12)),
-                ),
-              ],
+  Widget _buildSpecialistCard(
+      String? imageUrl, String? name, String? especialidade, bool isSelected) {
+    return Card(
+      elevation: 4,
+      color: isSelected
+          ? const Color.fromARGB(255, 205, 221, 221)
+          : const Color.fromARGB(255, 244, 244, 244), // Efeito de seleção
+      shape: isSelected
+          ? RoundedRectangleBorder(
+              side: BorderSide(
+                  color: const Color.fromARGB(144, 162, 196, 192),
+                  width: 2.0), // Borda colorida
+              borderRadius: BorderRadius.circular(8.0),
+            )
+          : RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: imageUrl != null && imageUrl.isNotEmpty
+                  ? Image.network(imageUrl,
+                      height: 60, width: 60, fit: BoxFit.cover)
+                  : Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.grey[300],
+                      child: Icon(Icons.person,
+                          size: 30,
+                          color: const Color.fromARGB(255, 246, 241, 241)),
+                    ),
             ),
-          ),
-        ],
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name ?? 'Nome não disponível',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Especialidade: ${especialidade ?? 'Não especificada'}',
+                    style:
+                        TextStyle(color: const Color.fromARGB(255, 14, 12, 12)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

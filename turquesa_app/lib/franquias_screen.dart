@@ -5,14 +5,14 @@ import 'agendamento_final_screen.dart';
 
 // Modelo da Franquia
 class Franquia {
-  final String id; // Adicionado para armazenar o id gerado pelo MongoDB
+  final String id;
   final String nome;
   final String imageUrl;
   final String address;
   final String hours;
 
   Franquia({
-    required this.id, // Agora id é um parâmetro obrigatório
+    required this.id, 
     required this.nome,
     required this.imageUrl,
     required this.address,
@@ -99,10 +99,10 @@ class FranquiaCard extends StatelessWidget {
 // Tela de Franquias
 class FranquiasScreen extends StatefulWidget {
   final dynamic selectedService;
-  final String categoryName; // Novo parâmetro adicionado
-  final String userId;       // Novo parâmetro adicionado
-  final String userEmail;    // Novo parâmetro adicionado
-  final String userName;     // Novo parâmetro adicionado
+  final String categoryName; 
+  final String userId;       
+  final String userEmail;    
+  final String userName;     
   final String userPhone;
 
   FranquiasScreen({

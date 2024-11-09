@@ -6,9 +6,9 @@ const Agendamento = require('../models/agendamento');
 
 // Lista de horários fixos disponíveis para agendamento
 const horariosFixos = [
-  "09:00", "10:00", "11:00", "12:00",
+  "09:00", "10:00", "11:00",
   "13:00", "14:00", "15:00", "16:00",
-  "17:00", "18:00"
+  "17:00"
 ];
 
 // Rota POST para criar um novo agendamento
@@ -66,5 +66,26 @@ router.get('/disponiveis/:profissionalId', async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar horários disponíveis.', error });
   }
 });
+
+// Nova rota GET para obter agendamentos de um usuário específico
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Buscar todos os agendamentos do usuário
+    const agendamentos = await Agendamento.find({ userId }).select('name subcategory price status')
+
+    
+    if (agendamentos.length === 0) {
+      return res.status(404).json({ message: 'Nenhum agendamento encontrado para este usuário.' });
+    }
+
+    res.json(agendamentos);
+  } catch (error) {
+    console.error("Erro ao buscar agendamentos do usuário:", error); // Adicionado para detalhar o erro
+    res.status(500).json({ message: 'Erro ao buscar agendamentos do usuário.', error: error.message });
+  }
+});
+
 
 module.exports = router;

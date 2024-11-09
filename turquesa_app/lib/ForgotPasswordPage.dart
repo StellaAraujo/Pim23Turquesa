@@ -13,7 +13,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   // Função para enviar solicitação de redefinição de senha
   Future<void> _sendPasswordResetEmail() async {
     final String email = _emailController.text;
-    const String url = 'http://localhost:3000/user/forgot-password'; // URL da sua API de redefinição de senha
+    const String url = 'http://localhost:3000/user/forgot-password';
 
     try {
       final response = await http.post(

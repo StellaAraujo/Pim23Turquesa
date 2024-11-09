@@ -37,7 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final String email = _emailController.text;
     final String phone = _phoneController.text;
 
-    const String url = 'http://192.168.15.12:3000/user/updateProfile';
+    const String url = 'http://localhost:3000/user/updateProfile';
 
     try {
       final response = await http.put(

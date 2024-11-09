@@ -7,7 +7,23 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   // Lista para armazenar as avaliações
-  List<Map<String, dynamic>> evaluations = [];
+  List<Map<String, dynamic>> evaluations = [
+    {
+      'franquia': 0,
+      'profissional': 0,
+      'serviço': 0,
+    }
+  ];
+
+  // Função para enviar a avaliação (localmente ou para o backend)
+  void sendEvaluation() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Avaliação enviada com sucesso!')),
+    );
+
+    // Navega para a tela home após enviar a avaliação
+    Navigator.pushReplacementNamed(context, '/home');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +36,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
         padding: const EdgeInsets.all(16.0),
         children: [
           _buildNotificationCard(
-              "Promoção", "5% de desconto após a avaliação!", Icons.local_offer),
+            "Promoção",
+            "Você tem direito a 5% de desconto na próxima vez que fizer um agendamento e concluir a avaliação. Consulte o profissional para mais informações.",
+            Icons.local_offer,
+          ),
           const SizedBox(height: 16.0), // Espaço antes da seção de avaliação
           _buildEvaluationSection(context), // Adiciona a seção de avaliação
           const SizedBox(height: 16.0), // Espaço antes dos agendamentos
@@ -40,9 +59,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(description),
-        // Removendo o ícone de seta
-        trailing: null,
-        onTap: null, // Remove a funcionalidade de navegação
       ),
     );
   }
@@ -66,23 +82,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
             const SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal, // Cor do botão
+                backgroundColor: Colors.teal,
               ),
-              onPressed: () {
-                // Adicione a lógica para enviar a avaliação
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Avaliação enviada com sucesso!')),
-                );
-
-                // Salvar avaliação (exemplo simples)
-                setState(() {
-                  evaluations.add({
-                    'franquia': 0, // A avaliação deve ser coletada
-                    'profissional': 0, // A avaliação deve ser coletada
-                    'serviço': 0, // A avaliação deve ser coletada
-                  });
-                });
-              },
+              onPressed: sendEvaluation, // Chama a função para enviar a avaliação
               child: const Text('Enviar Avaliação'),
             ),
           ],
@@ -92,7 +94,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Widget _buildRatingRow(String label, String key) {
-    int rating = 0; // Inicializando a avaliação
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -100,13 +101,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
         Row(
           children: List.generate(5, (index) {
             return IconButton(
-              icon: Icon(Icons.star, color: rating > index ? Colors.teal : Colors.grey),
+              icon: Icon(
+                Icons.star,
+                color: (evaluations.last[key] ?? 0) > index ? Colors.teal : Colors.grey,
+              ),
               onPressed: () {
-                // Adiciona a lógica para registrar a avaliação
                 setState(() {
-                  rating = index + 1; // Atualiza a avaliação
-                  // Atualiza a avaliação na lista
-                  evaluations[evaluations.length - 1][key] = rating;
+                  evaluations.last[key] = index + 1; // Atualiza a avaliação
                 });
               },
             );
@@ -127,8 +128,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         subtitle: const Text("Veja seus agendamentos"),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: () {
-          // Navega para a tela de agendamentos
-          Navigator.pushNamed(context, '/agendamento_final_screen');
+          Navigator.pushNamed(context, '/profile');
         },
       ),
     );
