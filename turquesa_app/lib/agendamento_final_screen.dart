@@ -44,7 +44,7 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
 
   Future<void> _carregarProfissionais() async {
     final response = await http.get(Uri.parse(
-        'http://192.168.15.10:3000/profissionais/${widget.franquia.id}'));
+        'http://localhost:3000/profissionais/${widget.franquia.id}'));
     if (response.statusCode == 200) {
       List<dynamic> allProfissionais = json.decode(response.body);
       setState(() {
@@ -62,7 +62,7 @@ class _AgendamentoFinalScreenState extends State<AgendamentoFinalScreen> {
   Future<void> _carregarHorariosDisponiveis(
       String profissionalId, DateTime data) async {
     final response = await http.get(Uri.parse(
-        'http://192.168.15.10:3000/agendamentos/disponiveis/$profissionalId?data=${DateFormat('yyyy-MM-dd').format(data)}'));
+        'http://localhost:3000/agendamentos/disponiveis/$profissionalId?data=${DateFormat('yyyy-MM-dd').format(data)}'));
     if (response.statusCode == 200) {
       List<String> horarios = List<String>.from(json.decode(response.body));
 

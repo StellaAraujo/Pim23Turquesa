@@ -73,7 +73,7 @@ router.get('/:userId', async (req, res) => {
 
   try {
     // Buscar todos os agendamentos do usuário
-    const agendamentos = await Agendamento.find({ userId }).select('name subcategory price status')
+    const agendamentos = await Agendamento.find({ userId }).select('name status data hora category subcategory price')
 
     
     if (agendamentos.length === 0) {

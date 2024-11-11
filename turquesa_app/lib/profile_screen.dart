@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
+  // O construtor não precisa mais receber os parâmetros
   ProfileScreen({Key? key}) : super(key: key);
 
   @override
@@ -25,21 +26,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // Função para buscar os agendamentos do usuário
-  Future<void> _fetchAgendamentos() async {
+ Future<void> _fetchAgendamentos() async {
   String userId = UserSession.userId;
   try {
     final response = await http
         .get(Uri.parse('http://localhost:3000/agendamentos/$userId'));
 
     if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+
+      // Ordena os agendamentos pela data mais próxima para a mais distante
+      data.sort((a, b) {
+        DateTime dataA = DateTime.parse(a['data']);
+        DateTime dataB = DateTime.parse(b['data']);
+        return dataA.compareTo(dataB);
+      });
+
       setState(() {
-        // Decodifica o JSON e ordena por data
-        agendamentos = json.decode(response.body)
-          ..sort((a, b) {
-            DateTime dataA = DateTime.parse(a['data']);
-            DateTime dataB = DateTime.parse(b['data']);
-            return dataA.compareTo(dataB);
-          });
+        // Mapeia e formata a data para o formato DD/MM/AAAA HH:mm
+        agendamentos = data.map((agendamento) {
+          return {
+            ...agendamento,
+            'data': formatarData(agendamento['data']),
+          };
+        }).toList();
         isLoading = false;
       });
     } else {
@@ -59,11 +69,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-  // Função para formatar a data para o formato DD-MM-YYYY
+  // Função para formatar a data
   String formatarData(String dataOriginal) {
     try {
       DateTime dateTime = DateTime.parse(dataOriginal);
-      return DateFormat('dd-MM-yyyy').format(dateTime);
+      return DateFormat('dd/MM/yyyy ').format(dateTime);
     } catch (e) {
       return dataOriginal; // Retorna o valor original em caso de erro
     }
@@ -192,22 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 60),
-            Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    // Adiciona o título "Meus agendamentos"
-    Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(
-        "Meus agendamentos: ",
-        style: TextStyle(
-          fontSize: 16,
-         fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-      ),
-    ),
+            SizedBox(height: 30),
 
             // Exibição dos agendamentos
             isLoading
@@ -224,18 +219,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${agendamento['subcategory']}"),
-                                Text(
-                                    "R\$${agendamento['price']} | Status: ${agendamento['status']}"),
+                                Text( "${agendamento['subcategory']}"),
+                                Text("R\$${agendamento['price']} | Status: ${agendamento['status']}"),
                               ],
                             ),
                             trailing: Text(
-                              "${formatarData(agendamento['data'])} - ${agendamento['hora']}",
-                            ),
+                                "${agendamento['data']} - ${agendamento['hora']}"),
                           );
                         }).toList(),
                       ),
-                      SizedBox(height: 100),
 
             // Botão de Logout
             Center(
@@ -255,8 +247,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
-          ]
-        )
       ),
     );
   }
